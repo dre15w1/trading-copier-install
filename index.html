@@ -7,6 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Trading Copier — Install</title>
 <meta name="description" content="Install the Trading Copier agent on your own computer.">
+<link rel="icon" type="image/png" href="tv-icon.png">
 <style>
   :root{
     --bg:#0d1117; --panel:#161b22; --panel-2:#1c2128; --line:#30363d;
@@ -29,6 +30,16 @@
     border-radius:5px; padding:.12em .4em;
   }
   kbd{box-shadow:0 1px 0 var(--line)}
+
+  /* ---------- hero banner ---------- */
+  .tv-hero{background:#000;line-height:0;border-bottom:1px solid var(--line)}
+  .tv-hero img{
+    display:block;width:100%;height:auto;max-height:400px;
+    object-fit:cover;object-position:center 42%;
+  }
+  @media (max-width:640px){.tv-hero img{max-height:300px}}
+  /* Narrow screens crop the logo out of the wide shot; swap to the tall one. */
+  @media (max-width:460px){.tv-hero img{content:url("tv-hero-tall.jpg");max-height:360px}}
 
   /* ---------- header ---------- */
   header{border-bottom:1px solid var(--line); background:linear-gradient(180deg,#12181f,var(--bg))}
@@ -123,6 +134,11 @@
 </style>
 </head>
 <body>
+
+<div class="tv-hero">
+  <img src="tv-hero.jpg" alt="Team Villain" width="1600" height="900"
+       fetchpriority="high" decoding="async">
+</div>
 
 <header>
   <div class="head-inner">
