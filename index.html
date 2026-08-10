@@ -87,6 +87,33 @@
   }
   .dl:hover .cta{background:var(--accent);color:#04121f}
 
+  /* The guide sits under the two download cards: same panel treatment, laid
+     out as a row so it reads as a companion to the download rather than a
+     third thing to choose between. */
+  .guide{
+    display:flex;align-items:center;gap:18px;margin-top:16px;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:18px 22px;
+    text-decoration:none;color:inherit;
+    transition:border-color .15s,background .15s,transform .15s
+  }
+  .guide:hover{border-color:var(--accent-dim);background:var(--panel-2);transform:translateY(-1px)}
+  .guide:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .guide-ico{flex:none;color:var(--accent)}
+  .guide-ico svg{width:30px;height:30px;display:block}
+  .guide-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .guide-txt b{font-size:16.5px;font-weight:650}
+  .guide-txt .muted{font-size:13.5px;line-height:1.5}
+  .guide .cta{
+    flex:none;margin-left:auto;background:var(--accent-dim);color:#fff;
+    font-size:14px;font-weight:600;border-radius:7px;padding:9px 16px;white-space:nowrap
+  }
+  .guide:hover .cta{background:var(--accent);color:#04121f}
+  @media(max-width:640px){
+    .guide{flex-wrap:wrap;gap:12px}
+    .guide .cta{margin-left:0;width:100%;text-align:center}
+  }
+
   /* ---------- callouts ---------- */
   .note{
     border:1px solid var(--line);border-left:3px solid var(--accent);
@@ -187,6 +214,26 @@
       <a id="sums-link" href="#">SHA256SUMS.txt</a> before running it.
       <a id="all-releases" href="#">All versions</a>.
     </p>
+
+    <!-- The guide is served from this repo rather than as a release asset, so
+         the link works whether or not a release has been published yet, and
+         does not move when one is. -->
+    <a class="guide" href="Trading-Copier-Setup-Guide.pdf">
+      <span class="guide-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6zM14 2v4h4"
+          fill="none" stroke="currentColor" stroke-width="1.6"
+          stroke-linejoin="round"/><path d="M9 12h6M9 15.5h6M9 8.5h2"
+          fill="none" stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round"/></svg>
+      </span>
+      <span class="guide-txt">
+        <b>The setup guide (PDF)</b>
+        <span class="muted">Every screen, start to finish — the Schwab app,
+          installing, the six setup steps, the weekly reconnect, and what to do
+          when something looks wrong. Worth reading before step 1.</span>
+      </span>
+      <span class="cta">Read the guide</span>
+    </a>
   </section>
 
   <section>
@@ -311,8 +358,12 @@
 
   <section>
     <h2>Trouble?</h2>
-    <p class="muted">Text Andre. Useful things to include: which screen you’re stuck on, what
-      the message says word for word, and whether you’re on Windows or Mac.</p>
+    <p class="muted">Check <a href="Trading-Copier-Setup-Guide.pdf">the setup guide</a> first —
+      its last section lists every warning the program can show you and what each one
+      wants you to do.</p>
+    <p class="muted">Still stuck? Text Andre. Useful things to include: which screen you’re
+      stuck on, what the message says word for word, and whether you’re on Windows or Mac.
+      Screenshot the copier, never your Schwab app key page.</p>
   </section>
 
   <footer>
