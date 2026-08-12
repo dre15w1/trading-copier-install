@@ -114,6 +114,160 @@
     .guide .cta{margin-left:0;width:100%;text-align:center}
   }
 
+  /* ---------- agreement step ---------- */
+  .agree{
+    background:linear-gradient(180deg,#121b24,var(--panel));
+    border:1px solid var(--accent-dim);border-radius:var(--radius);
+    padding:24px;margin:0 0 22px
+  }
+  .agree h3{font-size:19px;margin:0 0 8px;letter-spacing:-.01em}
+  .agree p{margin:0 0 12px;color:var(--muted)}
+  .agree .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+  .agree .btn{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+    font-size:15px;font-weight:650;border-radius:8px;padding:11px 18px;
+    border:1px solid var(--line);color:var(--ink);background:var(--panel-2);
+    transition:border-color .15s,background .15s
+  }
+  .agree .btn:hover{border-color:var(--accent-dim);background:#1a2530}
+  .agree .btn.primary{background:var(--accent-dim);border-color:var(--accent-dim);color:#fff}
+  .agree .btn.primary:hover{background:var(--accent);color:#04121f}
+  .agree .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .agree ul{margin:12px 0 0;padding-left:20px;color:var(--muted);font-size:14.5px}
+  .agree li{margin-bottom:6px}
+  .stepmark{
+    display:inline-block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:700;color:var(--accent);margin:0 0 10px
+  }
+
+  /* ---------- terms gate ---------- */
+  .terms{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:0;margin:18px 0 0;overflow:hidden
+  }
+  .terms-scroll{
+    max-height:340px;overflow-y:auto;padding:20px 22px;
+    border-bottom:1px solid var(--line);background:var(--bg)
+  }
+  .terms-scroll h4{font-size:15px;margin:20px 0 6px;color:var(--ink)}
+  .terms-scroll h4:first-child{margin-top:0}
+  .terms-scroll p{font-size:14.5px;color:var(--muted);margin:0 0 10px}
+  .terms-scroll .hard{color:var(--ink);font-weight:600}
+  .terms-end{
+    margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);
+    color:var(--dim);font-size:13.5px
+  }
+  .terms-body{padding:18px 22px}
+  .ack{display:flex;gap:11px;align-items:flex-start;margin:0 0 13px;cursor:pointer}
+  .ack input{
+    width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent);cursor:pointer
+  }
+  .ack span{font-size:14.5px;line-height:1.5}
+  .ack input:disabled{cursor:not-allowed;opacity:.4}
+  .ack.locked span{color:var(--dim)}
+  .gate-status{
+    display:flex;align-items:center;gap:9px;margin-top:16px;padding:12px 14px;
+    border-radius:8px;background:var(--panel-2);border:1px solid var(--line);
+    font-size:14px;color:var(--muted)
+  }
+  .gate-status.done{border-color:var(--ok);color:var(--ok)}
+  .gate-status b{color:inherit}
+  .dl-grid.locked .dl{
+    opacity:.4;pointer-events:none;filter:grayscale(.6)
+  }
+
+  /* ---------- terms gate ---------- */
+  .terms{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:0;margin:18px 0 0;overflow:hidden
+  }
+  .terms-scroll{
+    max-height:340px;overflow-y:auto;padding:20px 22px;
+    border-bottom:1px solid var(--line);background:var(--bg)
+  }
+  .terms-scroll h4{font-size:15px;margin:20px 0 6px;color:var(--ink)}
+  .terms-scroll h4:first-child{margin-top:0}
+  .terms-scroll p{font-size:14.5px;color:var(--muted);margin:0 0 10px}
+  .terms-scroll .hard{color:var(--ink);font-weight:600}
+  .terms-end{
+    margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);
+    color:var(--dim);font-size:13.5px
+  }
+  .terms-body{padding:18px 22px}
+  .ack{display:flex;gap:11px;align-items:flex-start;margin:0 0 13px;cursor:pointer}
+  .ack input{
+    width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent);cursor:pointer
+  }
+  .ack span{font-size:14.5px;line-height:1.5}
+  .ack input:disabled{cursor:not-allowed;opacity:.4}
+  .ack.locked span{color:var(--dim)}
+  .gate-status{
+    display:flex;align-items:center;gap:9px;margin-top:16px;padding:12px 14px;
+    border-radius:8px;background:var(--panel-2);border:1px solid var(--line);
+    font-size:14px;color:var(--muted)
+  }
+  .gate-status.done{border-color:var(--ok);color:var(--ok)}
+  .gate-status b{color:inherit}
+  .dl-grid.locked .dl{
+    opacity:.4;pointer-events:none;filter:grayscale(.6)
+  }
+
+  /* ---------- per-OS instruction blocks ---------- */
+  .os-block{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:16px 18px;margin:0 0 14px
+  }
+  .os-label{
+    display:flex;align-items:center;gap:9px;font-weight:650;font-size:15px;
+    margin:0 0 10px;padding-bottom:10px;border-bottom:1px solid var(--line)
+  }
+  .os-label svg{width:17px;height:17px;fill:currentColor;opacity:.8;flex:none}
+  .os-block>p:last-child{margin-bottom:0}
+
+  /* Numbered sub-steps inside an OS block. Deliberately plainer than the
+     outer steps: a nested timeline reads as a second, competing list. */
+  ol.substeps{margin:12px 0 0;padding-left:24px}
+  ol.substeps>li{margin-bottom:12px;padding-left:4px}
+  ol.substeps>li:last-child{margin-bottom:0}
+  ol.substeps>li::marker{color:var(--accent);font-weight:650}
+
+  /* ---------- copyable command block ---------- */
+  .cmd{position:relative;margin:10px 0 0}
+  .cmd pre{
+    margin:0;background:#0a0f14;border:1px solid var(--line);border-radius:8px;
+    padding:14px 74px 14px 14px;overflow-x:auto;
+    font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    font-size:13.5px;line-height:1.7;color:#c9d6e2;-webkit-user-select:all;user-select:all
+  }
+  .cmd .copy{
+    position:absolute;top:9px;right:9px;font:inherit;font-size:12.5px;font-weight:600;
+    background:var(--panel-2);color:var(--ink);border:1px solid var(--line);
+    border-radius:6px;padding:5px 11px;cursor:pointer;transition:background .15s,border-color .15s
+  }
+  .cmd .copy:hover{border-color:var(--accent-dim);background:var(--accent-dim);color:#fff}
+  .cmd .copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .cmd .copy.done{border-color:var(--ok);color:var(--ok)}
+  @media(max-width:640px){
+    .cmd pre{padding-right:14px;padding-top:44px}
+    .cmd .copy{top:8px;left:9px;right:auto}
+  }
+
+  /* ---------- facts table ---------- */
+  .facts{display:grid;gap:12px}
+  .fact{
+    display:grid;grid-template-columns:150px 1fr;gap:16px;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:14px 18px
+  }
+  @media(max-width:640px){.fact{grid-template-columns:1fr;gap:4px}}
+  .fact dt{font-weight:650;font-size:14px}
+  .fact dd{margin:0;color:var(--muted);font-size:14.5px}
+
+  footer{
+    margin-top:64px;padding-top:24px;border-top:1px solid var(--line);
+    color:var(--dim);font-size:13px
+  }
+  footer a{color:var(--muted)}
   /* ---------- callouts ---------- */
   .note{
     border:1px solid var(--line);border-left:3px solid var(--accent);
@@ -187,8 +341,139 @@
 <div class="wrap">
 
   <section>
-    <h2>Download</h2>
-    <div class="dl-grid">
+    <h2>Step 1 &mdash; The agreement</h2>
+
+    <div class="agree">
+      <p class="stepmark">Read it, then sign it</p>
+      <h3>Everyone who runs this signs the same agreement first.</h3>
+      <p>
+        It says what the software is, what it does with your money, and what it
+        does <em>not</em> do &mdash; nobody but you can place a trade in your
+        account, and nobody but you ever sees your broker login. It also says,
+        plainly, that you can lose everything in the account.
+      </p>
+      <p>
+        Signing is electronic and takes a couple of minutes. You get a countersigned
+        copy by email, and a record is kept.
+      </p>
+
+      <div class="row">
+        <a class="btn" id="read-agreement" href="Trading-Copier-Agreement.pdf" target="_blank" rel="noopener">
+          Read the agreement (PDF)</a>
+        <a class="btn primary" id="sign-agreement" href="SIGNING_LINK_GOES_HERE"
+           target="_blank" rel="noopener">Sign the agreement</a>
+      </div>
+
+      <ul>
+        <li>Read it before you sign it. There are four places you initial, and
+          they are the parts that matter most.</li>
+        <li>If anything in it is not what you understood, stop and call Andre
+          before signing.</li>
+        <li>You can walk away at any time afterwards &mdash; uninstall the software,
+          or disconnect it at your broker.</li>
+      </ul>
+    </div>
+
+    {# The short version, on the page, before the download unlocks. This is not
+       the signature and does not replace it -- it is here so that nobody can
+       reach the download without having been shown, in plain words, the four
+       things they will be asked to initial. #}
+    <h3 style="margin-top:26px">The short version &mdash; read this before you download</h3>
+    <p class="muted">Scroll to the end, then tick each box. These are the same four
+      things you initial in the agreement itself.</p>
+
+    <div class="terms">
+      <div class="terms-scroll" id="terms-scroll" tabindex="0"
+           role="region" aria-label="Summary of terms">
+
+        <h4>1. Nobody but you can trade your account</h4>
+        <p>You create your own broker credentials and type them into the program
+          on your own computer, where they stay. <span class="hard">Andre never
+          receives them, never holds trading authority over your account, and
+          cannot place, change or cancel an order in it.</span> Every order is
+          placed by software running on your machine, under settings you choose.
+          Nobody can see your balances, positions or results except you and your
+          broker.</p>
+
+        <h4>2. This is not advice, and it is not tailored to you</h4>
+        <p>Andre is a software developer, not a financial professional. He is not
+          a registered investment adviser or broker-dealer and holds no securities
+          licence. Every signal is a description of a trade he is taking in his
+          own account, sent <span class="hard">in identical form to everybody</span>.
+          Nobody knows or considers your income, your tax situation, your other
+          holdings, how much risk suits you, or anything else about you.
+          <span class="hard">No signal is an opinion that a trade is right for
+          you.</span> Deciding to install this, to connect it to an account, to
+          choose any setting, and to act on any signal is your own decision.</p>
+
+        <h4>3. You can lose everything in the account</h4>
+        <p>The software is experimental and is changed often, sometimes several
+          times a day. It has had bugs and it will have more. It runs on your own
+          computer &mdash; if that computer is off, asleep or offline, the program
+          cannot act at all, including to close a position. Signals can arrive
+          late or not at all. Your fills will differ from Andre's, and can be a
+          loss where his was a profit. It trades options, including same-day-expiry
+          options that can lose their entire value within minutes. Stop-losses do
+          not guarantee a price.</p>
+        <p class="hard">Losing the entire balance of the account is a realistic
+          outcome, not a remote one. Do not connect this to money you cannot
+          afford to lose completely.</p>
+
+        <h4>4. Nobody is paid, and nobody is responsible</h4>
+        <p>Andre receives no fee, commission or share of anything. In exchange,
+          you accept the risk of what happens and release him and Walkers Software
+          from claims for trading losses, including losses caused by ordinary
+          mistakes in the software. <span class="hard">That release does not cover
+          gross negligence, deliberate wrongdoing or fraud, and it cannot waive
+          any right you have under securities law.</span></p>
+
+        <h4>5. What you are agreeing to keep private</h4>
+        <p>The program, how it works, and the signals themselves are Andre's. You
+          may not forward, republish or resell signals, or give the software to
+          anyone else. Your own account data and trade history are yours, and you
+          may share them freely with anyone, including a lawyer, an accountant or
+          a regulator.</p>
+
+        <p class="terms-end">That is the end of the summary. The full agreement is
+          the document that governs &mdash; if the two ever disagree, the signed
+          agreement wins. Tick the boxes below to continue.</p>
+      </div>
+
+      <div class="terms-body">
+        <label class="ack locked" for="ack1">
+          <input type="checkbox" id="ack1" class="ack-box" disabled>
+          <span>I understand that <b>nobody but me can place a trade in my
+            account</b>, and that my broker login stays on my own computer.</span>
+        </label>
+        <label class="ack locked" for="ack2">
+          <input type="checkbox" id="ack2" class="ack-box" disabled>
+          <span>I understand this is <b>not financial advice</b>, that the signals
+            are not tailored to me, and that nobody is considering whether any
+            trade suits my situation.</span>
+        </label>
+        <label class="ack locked" for="ack3">
+          <input type="checkbox" id="ack3" class="ack-box" disabled>
+          <span>I understand that <b>I can lose the entire balance of the
+            account</b>, that this is a realistic outcome, and that I will not
+            connect money I cannot afford to lose.</span>
+        </label>
+        <label class="ack locked" for="ack4">
+          <input type="checkbox" id="ack4" class="ack-box" disabled>
+          <span>I understand that <b>nobody is being paid and nobody is
+            responsible</b> for my losses, and that I still have to sign the full
+            agreement before Andre will send me any signals.</span>
+        </label>
+
+        <div class="gate-status" id="gate-status">
+          <span id="gate-text">Scroll to the end of the summary above to continue.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Step 2 &mdash; Download</h2>
+    <div class="dl-grid locked" id="dl-grid">
       <a class="dl" id="dl-win" href="#" data-asset="copier-agent-windows.exe">
         <span class="os">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 10 4.6v6.9H3zM11 4.45 21 3v8.5H11zM3 12.5h7v6.9L3 18.5zM11 12.5h10V21l-10-1.45z"/></svg>
@@ -204,7 +489,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.5-.15-2.85.85-3.6.85s-1.9-.83-3.1-.81c-1.6.03-3.05.93-3.87 2.35-1.65 2.86-.42 7.1 1.19 9.42.79 1.14 1.73 2.42 2.96 2.37 1.19-.05 1.64-.77 3.08-.77s1.85.77 3.1.74c1.28-.02 2.09-1.16 2.87-2.3.9-1.32 1.27-2.6 1.29-2.66-.03-.01-2.48-.95-2.5-3.78zM14 5.4c.66-.8 1.1-1.9.98-3-.95.04-2.1.63-2.78 1.42-.61.7-1.14 1.83-1 2.9 1.06.08 2.14-.54 2.8-1.32z"/></svg>
           macOS
         </span>
-        <span class="muted" style="font-size:14px">macOS 12 or newer · Apple Silicon &amp; Intel</span>
+        <span class="muted" style="font-size:14px">macOS 12 or newer · Apple Silicon (M1 or later)</span>
         <span class="cta">Download for Mac</span>
         <span class="meta" id="meta-mac">Loading…</span>
       </a>
@@ -276,14 +561,72 @@
 
       <li>
         <h3>Open it, and get past the warning</h3>
-        <p><strong>On Windows:</strong> double-click it. If a blue box says
-          <em>“Windows protected your PC”</em>, click <kbd>More info</kbd>, then
-          <kbd>Run anyway</kbd>.</p>
-        <p><strong>On Mac:</strong> don’t double-click it. <strong>Right-click</strong>
-          (or Control-click) the file, choose <kbd>Open</kbd>, then click
-          <kbd>Open</kbd> again in the box that appears. You only do this the first time.</p>
-        <p class="muted">If macOS says the file is “damaged”, open Terminal and run:<br>
-          <code>xattr -d com.apple.quarantine ~/Downloads/copier-agent</code></p>
+
+        <div class="os-block">
+          <p class="os-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 10 4.5v7H3zM11 4.3 21 3v8.5H11zM3 12.5h7v7l-7-1zM11 12.5h10V21l-10-1.3z"/></svg> On Windows</p>
+          <p>Double-click the file. If a blue box says <em>“Windows protected your
+            PC”</em>, click <kbd>More info</kbd>, then <kbd>Run anyway</kbd>. That’s it
+            — you only do this the first time.</p>
+        </div>
+
+        <div class="os-block">
+          <p class="os-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.7c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.15-2.8.85-3.5.85s-1.8-.83-3-.81c-1.5.02-2.9.9-3.7 2.27-1.6 2.75-.4 6.8 1.1 9 .75 1.1 1.6 2.3 2.8 2.26 1.1-.05 1.6-.73 2.9-.73s1.7.73 3 .7c1.2-.02 2-1.1 2.7-2.2.85-1.3 1.2-2.5 1.2-2.6 0-.03-2.3-.9-2.3-3.5zM14.2 5.6c.6-.75 1-1.8.9-2.85-.9.04-2 .6-2.65 1.35-.58.66-1.1 1.73-.95 2.75 1 .08 2.03-.5 2.7-1.25z"/></svg> On Mac</p>
+          <p><strong>Don’t double-click it.</strong> A Mac doesn’t recognise this kind of
+            file as a program, so double-clicking opens it in TextEdit and fills the
+            screen with gibberish. Nothing is broken when that happens — the Mac just
+            needs to be told, once, that this is an app.</p>
+
+          <p class="muted">It takes four short steps and about a minute. You never have
+            to do it again.</p>
+
+          <ol class="substeps">
+            <li><strong>Open Terminal.</strong> Press <kbd>⌘</kbd> + <kbd>Space</kbd>,
+              type <code>Terminal</code>, press <kbd>Return</kbd>. A window with a text
+              prompt opens.</li>
+
+            <li><strong>Copy the three lines below</strong> using the Copy button, then
+              click into the Terminal window and press <kbd>⌘</kbd> + <kbd>V</kbd> to
+              paste them.
+
+              <div class="cmd">
+                <button class="copy" type="button" data-copy="mac-cmds">Copy</button>
+<pre id="mac-cmds">chmod +x ~/Downloads/copier-agent-macos
+xattr -d com.apple.quarantine ~/Downloads/copier-agent-macos
+~/Downloads/copier-agent-macos</pre>
+              </div>
+            </li>
+
+            <li><strong>Press <kbd>Return</kbd>.</strong> The copier starts and your
+              browser opens by itself.</li>
+
+            <li><strong>Leave the Terminal window open.</strong> Closing it stops the
+              copier and no trades will be copied. Minimise it instead.</li>
+          </ol>
+
+          <p class="muted" style="margin-top:14px">What those lines do, in order:
+            the first tells your Mac the file is a program, the second clears the
+            “downloaded from the internet” flag that makes macOS refuse to run it, and
+            the third starts it.</p>
+
+          <div class="note" style="margin:16px 0 0">
+            <h3>If something doesn’t match</h3>
+            <p class="muted" style="margin-bottom:8px"><strong>“No such file or
+              directory”</strong> — the file isn’t in Downloads. Type
+              <code>chmod +x </code> (with the space), then drag the file from Finder
+              into the Terminal window. It fills in the real location for you. Do the
+              same for the other two lines.</p>
+            <p class="muted" style="margin-bottom:8px"><strong>“No such xattr”</strong>
+              — nothing to clear. That’s fine, carry on.</p>
+            <p class="muted" style="margin-bottom:8px"><strong>The file is called
+              <code>copier-agent-macos (1)</code></strong> — you downloaded it twice.
+              Delete both, download once more, and start again. A name with
+              <code>(1)</code> in it won’t match the lines above.</p>
+            <p class="muted" style="margin-bottom:0"><strong>Someone texted or AirDropped
+              you the file</strong> — download it yourself from the button at the top of
+              this page instead. Sending a program through Messages strips the very
+              setting step 2 puts back, and it will keep failing.</p>
+          </div>
+        </div>
       </li>
 
       <li>
@@ -439,6 +782,118 @@
       setText("foot-version", "latest");
     });
 })();
+
+// The terms gate. Boxes stay disabled until the summary has actually been
+// scrolled to the end, and the downloads stay locked until every box is ticked.
+//
+// This is FRICTION, NOT SECURITY, and it is written on the assumption that
+// whoever reads this source knows that. The release URL on GitHub is public and
+// works without ever loading this page. The point of the gate is that nobody
+// arrives at the download without having been shown, in plain words, the four
+// things they will be asked to initial -- not to stop a determined person.
+//
+// No state is stored anywhere. Reloading the page starts over, deliberately:
+// remembering the answer would let one person tick the boxes and another
+// download, which is the one outcome this is meant to prevent.
+(function () {
+  "use strict";
+  var scroller = document.getElementById("terms-scroll");
+  var boxes    = Array.prototype.slice.call(document.querySelectorAll(".ack-box"));
+  var grid     = document.getElementById("dl-grid");
+  var status   = document.getElementById("gate-status");
+  var text     = document.getElementById("gate-text");
+  if (!scroller || !boxes.length || !grid) { return; }
+
+  var links = Array.prototype.slice.call(grid.querySelectorAll("a.dl"));
+  links.forEach(function (a) { a.setAttribute("tabindex", "-1"); a.setAttribute("aria-disabled", "true"); });
+
+  var reachedEnd = false;
+
+  function unlockBoxes() {
+    if (reachedEnd) { return; }
+    reachedEnd = true;
+    boxes.forEach(function (b) {
+      b.disabled = false;
+      var label = b.closest(".ack");
+      if (label) { label.classList.remove("locked"); }
+    });
+    update();
+  }
+
+  function atEnd() {
+    // 24px of slack: a trackpad rarely lands exactly on the last pixel, and a
+    // gate that will not open for someone who did read it is worse than useless.
+    return scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 24;
+  }
+
+  function update() {
+    var ticked = boxes.filter(function (b) { return b.checked; }).length;
+    if (!reachedEnd) {
+      text.textContent = "Scroll to the end of the summary above to continue.";
+      status.classList.remove("done");
+    } else if (ticked < boxes.length) {
+      text.textContent = ticked + " of " + boxes.length +
+        " — tick each box to unlock the download.";
+      status.classList.remove("done");
+    } else {
+      text.textContent = "Downloads unlocked below. You still need to sign the " +
+        "full agreement before any signals will reach you.";
+      status.classList.add("done");
+    }
+    var open = reachedEnd && ticked === boxes.length;
+    grid.classList.toggle("locked", !open);
+    links.forEach(function (a) {
+      a.setAttribute("aria-disabled", open ? "false" : "true");
+      if (open) { a.removeAttribute("tabindex"); } else { a.setAttribute("tabindex", "-1"); }
+    });
+  }
+
+  scroller.addEventListener("scroll", function () { if (atEnd()) { unlockBoxes(); } });
+  boxes.forEach(function (b) { b.addEventListener("change", update); });
+
+  // If the summary is short enough not to scroll at all -- a tall window, or a
+  // reader who has zoomed out -- there is nothing to scroll to, so requiring a
+  // scroll event would lock the page shut. Check the geometry instead.
+  if (scroller.scrollHeight <= scroller.clientHeight + 24) { unlockBoxes(); }
+  update();
+}());
+
+// Copy buttons on command blocks. Typing these by hand is where people go
+// wrong -- a missed character in a path reads as "it's broken" rather than as
+// a typo. The block is also user-select:all, so a plain click-and-copy works
+// if the clipboard API is unavailable or blocked.
+(function () {
+  "use strict";
+  function flash(btn, text) {
+    var was = btn.textContent;
+    btn.textContent = text;
+    btn.classList.add("done");
+    setTimeout(function () {
+      btn.textContent = was;
+      btn.classList.remove("done");
+    }, 1800);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".copy"), function (btn) {
+    btn.addEventListener("click", function () {
+      var src = document.getElementById(btn.dataset.copy);
+      if (!src) { return; }
+      var text = src.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(function () { flash(btn, "Copied"); })
+          .catch(function () { flash(btn, "Press ⌘C"); });
+        return;
+      }
+      // Older Safari, and any page not served over https.
+      var sel = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(src);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      flash(btn, "Press ⌘C");
+    });
+  });
+}());
 </script>
 </body>
 </html>
