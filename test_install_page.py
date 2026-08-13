@@ -16,3 +16,10 @@ def test_page_offers_both_mac_architectures() -> None:
 def test_page_explains_device_code_onboarding() -> None:
     assert "Copy device code" in PAGE
     assert "TV1-" in PAGE
+
+
+def test_mac_commands_choose_the_download_for_this_cpu() -> None:
+    assert 'uname -m' in PAGE
+    assert 'copier-agent-macos-apple-silicon' in PAGE
+    assert 'copier-agent-macos-intel' in PAGE
+    assert '~/Downloads/copier-agent-macos\n' not in PAGE

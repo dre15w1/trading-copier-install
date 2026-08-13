@@ -601,9 +601,14 @@
 
               <div class="cmd">
                 <button class="copy" type="button" data-copy="mac-cmds">Copy</button>
-<pre id="mac-cmds">chmod +x ~/Downloads/copier-agent-macos
-xattr -d com.apple.quarantine ~/Downloads/copier-agent-macos
-~/Downloads/copier-agent-macos</pre>
+<pre id="mac-cmds">if [ "$(uname -m)" = "arm64" ]; then
+  FILE="$HOME/Downloads/copier-agent-macos-apple-silicon"
+else
+  FILE="$HOME/Downloads/copier-agent-macos-intel"
+fi
+chmod +x "$FILE"
+xattr -d com.apple.quarantine "$FILE"
+"$FILE"</pre>
               </div>
             </li>
 
@@ -629,7 +634,7 @@ xattr -d com.apple.quarantine ~/Downloads/copier-agent-macos
             <p class="muted" style="margin-bottom:8px"><strong>“No such xattr”</strong>
               — nothing to clear. That’s fine, carry on.</p>
             <p class="muted" style="margin-bottom:8px"><strong>The file is called
-              <code>copier-agent-macos (1)</code></strong> — you downloaded it twice.
+              a Mac filename ending in <code>(1)</code></strong> — you downloaded it twice.
               Delete both, download once more, and start again. A name with
               <code>(1)</code> in it won’t match the lines above.</p>
             <p class="muted" style="margin-bottom:0"><strong>Someone texted or AirDropped
