@@ -1,4 +1,4 @@
-"""Build the public Trading Copier v0.9.0 setup guide."""
+"""Build the public Trading Copier v0.9.1 setup guide."""
 
 from pathlib import Path
 
@@ -37,7 +37,7 @@ class GuideDoc(BaseDocTemplate):
     def __init__(self, filename: str):
         super().__init__(filename, pagesize=letter, rightMargin=54, leftMargin=54,
                          topMargin=58, bottomMargin=52,
-                         title="Trading Copier - Setup and Use Guide v0.9.0",
+                         title="Trading Copier - Setup and Use Guide v0.9.1",
                          author="Walkers Software LLC")
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height,
                       id="normal")
@@ -50,7 +50,7 @@ class GuideDoc(BaseDocTemplate):
         canvas.line(54, 40, letter[0] - 54, 40)
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(MUTED)
-        canvas.drawString(54, 27, "Trading Copier v0.9.0 - Setup and Use Guide")
+        canvas.drawString(54, 27, "Trading Copier v0.9.1 - Setup and Use Guide")
         canvas.drawRightString(letter[0] - 54, 27, f"Page {doc.page}")
         canvas.restoreState()
 
@@ -120,10 +120,10 @@ logo.hAlign = "CENTER"
 cover_content = [Spacer(1, 0.7 * inch), logo, Spacer(1, 0.7 * inch),
                  p("Trading Copier", "CoverTitle"),
                  p("Setup and Use Guide", "CoverTitle"), Spacer(1, 0.15 * inch),
-                 p("Agent version 0.9.0", "CoverSub"),
+                 p("Agent version 0.9.1", "CoverSub"),
                  p("Windows, Mac Apple Silicon, and Mac Intel", "CoverSub"),
                  Spacer(1, 0.55 * inch),
-                 p("Revised 12 August 2026", "CoverSub")]
+                 p("Revised 13 August 2026", "CoverSub")]
 cover._cellvalues[0][0] = cover_content
 story += [cover, PageBreak()]
 
@@ -339,7 +339,7 @@ story += [p("Local folder", "H2x"),
                    "The publisher/device fingerprint read aloud for confirmation.",
                    "A redacted screenshot of a non-secret error page or the app log when requested."]),
           Spacer(1, .25 * inch),
-          p("Trading Copier - Setup and Use Guide. Revised 12 August 2026 for agent version 0.9.0. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
+          p("Trading Copier - Setup and Use Guide. Revised 13 August 2026 for agent version 0.9.1. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
           p("Copyright 2026 Walkers Software LLC. All rights reserved.", "Smallx")]
 
 
