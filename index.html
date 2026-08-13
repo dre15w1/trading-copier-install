@@ -554,6 +554,40 @@
     </div>
   </section>
 
+  <section id="long-term">
+    <h2>Long Term &mdash; optional, native, and your account</h2>
+    <div class="note">
+      <h3>No one else's AI key is included.</h3>
+      <p>The Long Term screen works without AI. If you want deeper narrative
+        research, choose OpenAI, Anthropic, or local Ollama and connect your own
+        account. OpenAI and Anthropic charge you directly based on the model and
+        usage. A ChatGPT or Claude chat subscription does not automatically pay
+        for API use.</p>
+    </div>
+    <ol class="steps">
+      <li><h3>Partition the shared Schwab account first</h3><p>Open <b>Long Term</b>
+        and set the percentage reserved for it. Long Term starts at 0% and cannot
+        open a position until you choose an allocation. Copied/short-term sizing
+        uses only the remainder.</p></li>
+      <li><h3>Choose one of four analysis modes</h3><ul>
+        <li><b>No AI:</b> free rule-based quote review, holdings, proposals, and approvals.</li>
+        <li><b>OpenAI:</b> create an API key in the <a href="https://platform.openai.com/docs/quickstart/make-your-first-api-request" rel="noopener">OpenAI API dashboard</a>, add API billing or credits, check <a href="https://openai.com/api/pricing/" rel="noopener">current API pricing</a>, paste the key, choose a model, save, and test.</li>
+        <li><b>Anthropic:</b> create an API key in the <a href="https://console.anthropic.com/" rel="noopener">Anthropic Console</a>, enable billing, check <a href="https://docs.anthropic.com/en/docs/about-claude/pricing" rel="noopener">current API pricing</a>, paste the key, choose a model, save, and test.</li>
+        <li><b>Ollama:</b> install it from the <a href="https://ollama.com/download" rel="noopener">official download page</a>, run <code>ollama run llama3.2</code>, choose Ollama in the copier, keep <code>http://127.0.0.1:11434</code>, enter <code>llama3.2</code>, save, and test. Ollama has no per-call provider fee, but models can use substantial disk, memory, CPU/GPU time, electricity, and hardware.</li>
+      </ul></li>
+      <li><h3>Research, then create a proposal</h3><p>Run one ticker before a
+        watchlist. Deep watchlist mode can make one provider call per ticker.
+        Research never authorizes an order.</p></li>
+      <li><h3>Approve by default</h3><p>Buy, trim, exit, and covered-call actions
+        wait in the approval queue. The automation override requires a separate
+        risk acknowledgement and can place real orders without another click.
+        AI can be wrong; covered-call assignment can sell your shares.</p></li>
+    </ol>
+    <p class="muted">Keys are write-only in the screen and stored in Windows
+      Credential Manager or macOS Keychain when available. Use <b>Delete saved key</b>
+      before changing providers or giving the computer to someone else.</p>
+  </section>
+
   <section>
     <h2>Installing</h2>
 

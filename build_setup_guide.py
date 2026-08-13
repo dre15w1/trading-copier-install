@@ -1,4 +1,4 @@
-"""Build the public Trading Copier v0.8.0 setup guide."""
+"""Build the public Trading Copier v0.9.0 setup guide."""
 
 from pathlib import Path
 
@@ -37,7 +37,7 @@ class GuideDoc(BaseDocTemplate):
     def __init__(self, filename: str):
         super().__init__(filename, pagesize=letter, rightMargin=54, leftMargin=54,
                          topMargin=58, bottomMargin=52,
-                         title="Trading Copier - Setup and Use Guide v0.8.0",
+                         title="Trading Copier - Setup and Use Guide v0.9.0",
                          author="Walkers Software LLC")
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height,
                       id="normal")
@@ -50,7 +50,7 @@ class GuideDoc(BaseDocTemplate):
         canvas.line(54, 40, letter[0] - 54, 40)
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(MUTED)
-        canvas.drawString(54, 27, "Trading Copier v0.8.0 - Setup and Use Guide")
+        canvas.drawString(54, 27, "Trading Copier v0.9.0 - Setup and Use Guide")
         canvas.drawRightString(letter[0] - 54, 27, f"Page {doc.page}")
         canvas.restoreState()
 
@@ -120,7 +120,7 @@ logo.hAlign = "CENTER"
 cover_content = [Spacer(1, 0.7 * inch), logo, Spacer(1, 0.7 * inch),
                  p("Trading Copier", "CoverTitle"),
                  p("Setup and Use Guide", "CoverTitle"), Spacer(1, 0.15 * inch),
-                 p("Agent version 0.8.0", "CoverSub"),
+                 p("Agent version 0.9.0", "CoverSub"),
                  p("Windows, Mac Apple Silicon, and Mac Intel", "CoverSub"),
                  Spacer(1, 0.55 * inch),
                  p("Revised 12 August 2026", "CoverSub")]
@@ -265,7 +265,51 @@ story += [bullets(["Leave the agent running and the computer awake whenever a co
                     "If needed, paste the full callback URL into the copier's recovery box.",
                     "Confirm the dashboard shows roughly seven days remaining."]), PageBreak()]
 
-story += heading("Troubleshooting", "Section 12")
+story += heading("Long Term and shared-account partitions", "Section 12")
+story += [p("The native Long Term screen is optional. It can research tickers, scan a watchlist, show holdings, prepare trim or exit proposals, find covered-call candidates, and submit an approved proposal through your own connected Schwab account."),
+          p("Partition before buying", "H2x"),
+          numbered(["Open <b>Long Term</b> from the navigation.",
+                    "Set the percentage of account equity reserved for Long Term. It starts at <b>0%</b>, so it cannot open a position until you choose an amount.",
+                    "The copied/short-term side sizes from the remaining percentage. For example, 25% Long Term leaves 75% for short-term sizing.",
+                    "Review the committed amount on the screen before creating another opening proposal."]),
+          p("Both sides also recheck live broker buying power. A partition is a software limit, not a separate Schwab subaccount; Schwab still reports one combined balance.", "Callout"),
+          p("Approval is the default", "H2x"),
+          bullets(["Research does not place an order.",
+                   "Buy, add, trim, exit, and covered-call actions enter the approval queue.",
+                   "Immediately before submission the app rechecks the partition, buying power, owned shares, covered shares, and live bid/ask spread.",
+                   "An uncertain broker response is never retried automatically; inspect Schwab first.",
+                   "Automatic Long Term execution is a separate override with its own acknowledgement. Ordinary copier automation does not enable it."]), PageBreak()]
+
+story += heading("Optional AI - choose one of three providers", "Section 13")
+story += [p("Long Term works in <b>No AI</b> mode. If you choose a provider, it is your provider account, key, usage, and bill. Andre's LLM credentials are not present in the subscriber app and cannot be borrowed as a fallback.", "Danger"),
+          p("OpenAI", "H2x"),
+          numbered(["Open https://platform.openai.com/docs/quickstart/make-your-first-api-request and create your own API account and API key.",
+                    "Add API billing or credits. A ChatGPT subscription does not include API usage.",
+                    "Review the current provider prices at https://openai.com/api/pricing/ and use the provider dashboard to set a spending limit if available.",
+                    "In Long Term, choose OpenAI, enter a supported model name and paste the key, acknowledge direct billing, save, and click <b>Test connection</b>.",
+                    "Run one ticker before a watchlist scan. Use <b>Delete saved key</b> to remove it from this computer."]),
+          p("Anthropic", "H2x"),
+          numbered(["Open https://console.anthropic.com/, create your own account, enable API billing, and create an API key.",
+                    "Review current prices and model names at https://docs.anthropic.com/en/docs/about-claude/pricing.",
+                    "In Long Term, choose Anthropic, enter a supported model name and paste the key, acknowledge direct billing, save, and test.",
+                    "Run one ticker first. Delete the saved key from the screen when changing providers or retiring the computer."]),
+          p("Provider prices and model availability change. The links above are authoritative. Deep scans can make one paid call per ticker; the app does not promise a fixed dollar cost.", "Callout"), PageBreak()]
+
+story += heading("Optional local AI with Ollama", "Section 14")
+story += [p("Ollama has no per-call provider bill, but model downloads can use tens of gigabytes and analysis uses memory, CPU or GPU time, electricity, and your hardware. Intel Macs use CPU-only execution and may be slow."),
+          numbered(["Install Ollama from https://ollama.com/download. The current Ollama requirements may be newer than the copier's own operating-system requirements, so check that page first.",
+                    "Open PowerShell on Windows or Terminal on Mac and run <b>ollama run llama3.2</b>. Wait for the model download and one successful response.",
+                    "Keep Ollama running. In the copier's Long Term screen choose <b>Ollama (local)</b>.",
+                    "Keep the local URL <b>http://127.0.0.1:11434</b>, enter <b>llama3.2</b> as the model, save, and test.",
+                    "Run one-ticker research before scanning a watchlist."]),
+          p("The copier accepts only a loopback Ollama address in this release. It will reject a remote hostname so portfolio facts are not silently sent to an unreviewed server.", "Callout"),
+          p("If the test fails", "H2x"),
+          bullets(["Start the Ollama application and try again.",
+                   "If the model is missing, run ollama run llama3.2 and let it finish downloading.",
+                   "If the computer runs out of memory or becomes too slow, choose No AI or a smaller local model.",
+                   "OpenAI/Anthropic 401 or 403 errors usually mean the key or billing is not ready; 429 means a provider usage or rate limit. Check the provider dashboard."]), PageBreak()]
+
+story += heading("Troubleshooting", "Section 15")
 trouble = [[p("Problem", "Smallx"), p("What to do", "Smallx")],
            [p("Windows protected your PC", "Smallx"), p("Verify the official filename and source, then More info > Run anyway.", "Smallx")],
            [p("Mac says damaged or cannot verify", "Smallx"), p("Run chmod and xattr commands from section 6 against the correct architecture file.", "Smallx")],
@@ -295,7 +339,7 @@ story += [p("Local folder", "H2x"),
                    "The publisher/device fingerprint read aloud for confirmation.",
                    "A redacted screenshot of a non-secret error page or the app log when requested."]),
           Spacer(1, .25 * inch),
-          p("Trading Copier - Setup and Use Guide. Revised 12 August 2026 for agent version 0.8.0. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
+          p("Trading Copier - Setup and Use Guide. Revised 12 August 2026 for agent version 0.9.0. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
           p("Copyright 2026 Walkers Software LLC. All rights reserved.", "Smallx")]
 
 

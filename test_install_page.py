@@ -23,3 +23,12 @@ def test_mac_commands_choose_the_download_for_this_cpu() -> None:
     assert 'copier-agent-macos-apple-silicon' in PAGE
     assert 'copier-agent-macos-intel' in PAGE
     assert '~/Downloads/copier-agent-macos\n' not in PAGE
+
+
+def test_page_has_all_longterm_provider_and_cost_instructions() -> None:
+    for text in ("OpenAI", "Anthropic", "Ollama", "No AI", "charge you directly",
+                 "Long Term starts at 0%", "approval queue", "Delete saved key"):
+        assert text in PAGE
+    assert "openai.com/api/pricing" in PAGE
+    assert "docs.anthropic.com/en/docs/about-claude/pricing" in PAGE
+    assert "ollama.com/download" in PAGE
