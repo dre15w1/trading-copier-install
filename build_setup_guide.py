@@ -1,4 +1,4 @@
-"""Build the public Trading Copier v0.13.4 setup guide."""
+"""Build the public Trading Copier v0.13.7 setup guide."""
 
 from pathlib import Path
 
@@ -25,19 +25,22 @@ from reportlab.platypus import (
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "Trading-Copier-Setup-Guide.pdf"
-BLUE = colors.HexColor("#35bdf5")
-NAVY = colors.HexColor("#07131d")
-PANEL = colors.HexColor("#eef5f8")
-INK = colors.HexColor("#152631")
-MUTED = colors.HexColor("#526773")
-RED = colors.HexColor("#a52b2b")
+BLUE = colors.HexColor("#58a6ff")
+NAVY = colors.HexColor("#0d1117")
+PANEL = colors.HexColor("#161b22")
+PANEL2 = colors.HexColor("#1c2128")
+INK = colors.HexColor("#e6edf3")
+MUTED = colors.HexColor("#9aa5b1")
+LINE = colors.HexColor("#30363d")
+RED = colors.HexColor("#ff7b72")
+GREEN = colors.HexColor("#3fb950")
 
 
 class GuideDoc(BaseDocTemplate):
     def __init__(self, filename: str):
         super().__init__(filename, pagesize=letter, rightMargin=54, leftMargin=54,
                          topMargin=58, bottomMargin=52,
-                         title="Trading Copier - Setup and Use Guide v0.13.4",
+                         title="Trading Copier - Setup and Use Guide v0.13.7",
                          author="Walkers Software LLC")
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height,
                       id="normal")
@@ -46,11 +49,13 @@ class GuideDoc(BaseDocTemplate):
 
     def _decorate(self, canvas, doc):
         canvas.saveState()
-        canvas.setStrokeColor(colors.HexColor("#d4e0e6"))
+        canvas.setFillColor(NAVY)
+        canvas.rect(0, 0, letter[0], letter[1], fill=1, stroke=0)
+        canvas.setStrokeColor(LINE)
         canvas.line(54, 40, letter[0] - 54, 40)
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(MUTED)
-        canvas.drawString(54, 27, "Trading Copier v0.13.4 - Setup and Use Guide")
+        canvas.drawString(54, 27, "TEAM VILLAIN  /  Trading Copier v0.13.7")
         canvas.drawRightString(letter[0] - 54, 27, f"Page {doc.page}")
         canvas.restoreState()
 
@@ -63,25 +68,25 @@ styles.add(ParagraphStyle(name="CoverSub", parent=styles["Normal"], fontSize=13,
                           leading=19, textColor=colors.HexColor("#d8edf6"),
                           alignment=TA_CENTER))
 styles.add(ParagraphStyle(name="H1x", parent=styles["Heading1"], fontName="Helvetica-Bold",
-                          fontSize=21, leading=25, textColor=NAVY, spaceAfter=12,
+                          fontSize=21, leading=25, textColor=INK, spaceAfter=12,
                           keepWithNext=True))
 styles.add(ParagraphStyle(name="H2x", parent=styles["Heading2"], fontName="Helvetica-Bold",
-                          fontSize=14, leading=18, textColor=colors.HexColor("#0879aa"),
+                          fontSize=14, leading=18, textColor=BLUE,
                           spaceBefore=13, spaceAfter=7, keepWithNext=True))
 styles.add(ParagraphStyle(name="Bodyx", parent=styles["BodyText"], fontName="Helvetica",
                           fontSize=10.2, leading=15, textColor=INK, spaceAfter=8))
 styles.add(ParagraphStyle(name="Smallx", parent=styles["BodyText"], fontSize=8.7,
                           leading=12, textColor=MUTED, spaceAfter=5))
 styles.add(ParagraphStyle(name="Codex", parent=styles["Code"], fontName="Courier",
-                          fontSize=8.3, leading=12, backColor=colors.HexColor("#e9f0f4"),
-                          borderPadding=8, borderColor=colors.HexColor("#cad9e1"),
+                          fontSize=8.3, leading=12, textColor=INK, backColor=PANEL2,
+                          borderPadding=8, borderColor=LINE,
                           borderWidth=0.5, borderRadius=4, spaceBefore=5, spaceAfter=9))
 styles.add(ParagraphStyle(name="Callout", parent=styles["BodyText"], fontSize=10,
-                          leading=14, textColor=INK, backColor=PANEL, borderColor=BLUE,
+                          leading=14, textColor=INK, backColor=PANEL2, borderColor=BLUE,
                           borderWidth=1, borderPadding=10, spaceBefore=7, spaceAfter=10))
 styles.add(ParagraphStyle(name="Danger", parent=styles["BodyText"], fontSize=10,
-                          leading=14, textColor=RED, backColor=colors.HexColor("#fff1f1"),
-                          borderColor=colors.HexColor("#df8989"), borderWidth=1,
+                          leading=14, textColor=RED, backColor=colors.HexColor("#2a1315"),
+                          borderColor=RED, borderWidth=1,
                           borderPadding=10, spaceBefore=7, spaceAfter=10))
 
 
@@ -92,12 +97,14 @@ def p(text, style="Bodyx"):
 def bullets(items):
     return ListFlowable([ListItem(p(x), leftIndent=12) for x in items], bulletType="bullet",
                         leftIndent=20, bulletFontName="Helvetica", bulletFontSize=8,
+                        bulletColor=BLUE,
                         spaceAfter=8)
 
 
 def numbered(items):
     return ListFlowable([ListItem(p(x), leftIndent=12) for x in items], bulletType="1",
                         start="1", leftIndent=24, bulletFontName="Helvetica-Bold",
+                        bulletColor=BLUE,
                         spaceAfter=8)
 
 
@@ -111,20 +118,21 @@ def heading(title, kicker=None):
 
 story = []
 
-# Cover
-cover = Table([[""]], colWidths=[letter[0] - 108], rowHeights=[6.5 * inch])
+# Cover — use the same approved hero and dark interface treatment as the app.
+hero = Image(str(ROOT / "tv-hero.jpg"), width=7.0 * inch, height=3.94 * inch)
+hero.hAlign = "CENTER"
+cover = Table([[
+    [hero, Spacer(1, 0.32 * inch), p("Trading Copier", "CoverTitle"),
+     p("Setup and Use Guide", "CoverTitle"), Spacer(1, 0.08 * inch),
+     p("Version 0.13.7  /  Windows + macOS", "CoverSub"),
+     p("Revised 14 August 2026", "CoverSub")]
+]], colWidths=[letter[0] - 108], rowHeights=[6.75 * inch])
 cover.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), NAVY),
-                           ("BOX", (0, 0), (-1, -1), 0, NAVY)]))
-logo = Image(str(ROOT / "tv-logo.png"), width=2.5 * inch, height=0.72 * inch)
-logo.hAlign = "CENTER"
-cover_content = [Spacer(1, 0.7 * inch), logo, Spacer(1, 0.7 * inch),
-                 p("Trading Copier", "CoverTitle"),
-                 p("Setup and Use Guide", "CoverTitle"), Spacer(1, 0.15 * inch),
-                 p("Agent version 0.13.4", "CoverSub"),
-                 p("Windows, Mac Apple Silicon, and Mac Intel", "CoverSub"),
-                 Spacer(1, 0.55 * inch),
-                 p("Revised 13 August 2026", "CoverSub")]
-cover._cellvalues[0][0] = cover_content
+                           ("BOX", (0, 0), (-1, -1), 1, LINE),
+                           ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                           ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                           ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                           ("TOPPADDING", (0, 0), (-1, -1), 0)]))
 story += [cover, PageBreak()]
 
 story += heading("Read this first", "Section 1")
@@ -139,7 +147,7 @@ story += [p("The Trading Copier receives encrypted trade signals from Andre and 
 resources = [[p("Installation page", "Smallx"), p("https://dre15w1.github.io/trading-copier-install/", "Smallx")],
              [p("Checksums", "Smallx"), p("https://github.com/dre15w1/trading-copier-install/releases/latest/download/SHA256SUMS.txt", "Smallx")]]
 t = Table(resources, colWidths=[1.25 * inch, 5.15 * inch])
-t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), PANEL), ("GRID", (0, 0), (-1, -1), .5, colors.HexColor("#ccdce4")), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 7), ("BOTTOMPADDING", (0, 0), (-1, -1), 7)]))
+t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), PANEL), ("GRID", (0, 0), (-1, -1), .5, LINE), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 7), ("BOTTOMPADDING", (0, 0), (-1, -1), 7)]))
 story += [t, PageBreak()]
 
 story += heading("The complete setup in one page", "Section 2")
@@ -150,11 +158,11 @@ story += [numbered([
     "The app creates its private connection locally and displays one <b>TV1- device code</b>.",
     "Click <b>Copy device code</b> and send the complete TV1- code to Andre. Never send your Schwab secret or private key.",
     "Andre opens Signal Access, pastes your code, and grants specific strategies.",
-    "Wait for the app to confirm the link, connect Schwab, choose limits, and leave <b>Approve first</b> selected.",
+    "Wait for the app to show <b>Connected to Andre</b>, connect Schwab, choose limits, and leave <b>Approve first</b> selected.",
     "Receive a synthetic test entry and exit before considering live execution.",
     "Enable start at login and prevent the computer from sleeping during market hours.",
 ]),
-          p("The TV1- code is safe to send. It contains a device identifier and public key only. The private key stays in Windows Credential Manager, macOS Keychain, or the app's protected local fallback.", "Callout"),
+          p("The TV1- code is safe to send. It contains a device identifier and public key only. The private key stays in Windows Credential Manager, macOS Keychain, or the app's protected local fallback. After Andre enables the device, a private non-trading connection check confirms that exact installation can receive messages.", "Callout"),
           PageBreak()]
 
 story += heading("Create your Schwab developer app", "Section 3")
@@ -166,7 +174,7 @@ data = [[p("Field", "Smallx"), p("Value", "Smallx")],
         [p("Callback URL", "Smallx"), p("https://127.0.0.1:8182/callback", "Smallx")],
         [p("Description", "Smallx"), p("Personal trading automation for my own self-directed account", "Smallx")]]
 t = Table(data, colWidths=[1.45 * inch, 4.95 * inch], repeatRows=1)
-t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), NAVY), ("TEXTCOLOR", (0, 0), (-1, 0), colors.white), ("BACKGROUND", (0, 1), (-1, -1), PANEL), ("GRID", (0, 0), (-1, -1), .5, colors.HexColor("#bdced7")), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 7), ("BOTTOMPADDING", (0, 0), (-1, -1), 7)]))
+t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), PANEL2), ("TEXTCOLOR", (0, 0), (-1, 0), colors.white), ("BACKGROUND", (0, 1), (-1, -1), PANEL), ("GRID", (0, 0), (-1, -1), .5, LINE), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 7), ("BOTTOMPADDING", (0, 0), (-1, -1), 7)]))
 story += [t, p("The callback must match exactly. A trailing slash, localhost in place of 127.0.0.1, or a different scheme can break authorization. Changing it after approval may send the app back through review.", "Danger"),
           p("When the app becomes Ready for Use, copy its App Key/Client ID and Secret/Client Secret into the copier setup screen. Do not send either value to Andre."), PageBreak()]
 
@@ -180,6 +188,15 @@ story += [p("Use the official installation page. The three downloads are separat
           p("https://github.com/dre15w1/trading-copier-install/releases/latest/download/copier-agent-macos-intel", "Codex"),
           p("On a Mac, choose Apple menu > About This Mac. If it says Chip and begins with Apple M, choose Apple Silicon. If it says Processor and mentions Intel, choose Intel.", "Callout"),
           p("Only download from the official page. These builds are currently unsigned, so your operating system will warn you. A copy sent through email, text, AirDrop, or an unfamiliar link should not be run."), PageBreak()]
+
+story += heading("Updating without setting up again", "Section 4A")
+story += [p("Install the new version over the old one. Windows and Mac updates preserve the existing <b>.trading-copier</b> data folder, device identity, private key, Schwab app details, account selection, limits, and local history."),
+          numbered(["Quit the running copier from its footer before replacing it.",
+                    "Download the newest build for the same operating system and Mac architecture.",
+                    "Install or launch the replacement normally.",
+                    "Confirm the Home screen shows <b>Connected to Andre</b> and the expected Schwab account.",
+                    "Only send Andre a new TV1- code if the app explicitly says the device must be relinked or this is a different computer."]),
+          p("Do not select any option that creates a brand-new identity during a routine update. Existing users should not have to exchange keys again.", "Callout"), PageBreak()]
 
 story += heading("Run it on Windows", "Section 5")
 story += [numbered(["Open your Downloads folder.",
@@ -203,7 +220,7 @@ story += [p("Step 1 - Connect to Andre", "H2x"),
           numbered(["The app creates its private connection automatically.",
                     "Click <b>Copy code</b>. The complete value begins with <b>TV1-</b>.",
                     "Send the complete TV1- code to Andre. No signal key is entered or sent.",
-                    "Keep the app open. It advances automatically after Andre links the device."]),
+                    "Keep the app open. Andre's app sends a signed, non-trading confirmation to this device; the page then displays <b>Connected to Andre</b> and advances automatically."]),
           p("Do not send screenshots of Schwab credentials. Do not send files from the .trading-copier folder. Andre needs only the TV1- device code for signal access.", "Danger"),
           p("If you replace your computer, the new installation gets a new code. Send the new TV1- code to Andre so he can replace the old device. The old computer then stops receiving future entries."), PageBreak()]
 
@@ -233,6 +250,7 @@ story += [p("On Andre's computer, Signal Access runs locally at http://127.0.0.1
                     "Paste the friend's complete TV1- device code.",
                     "Select the strategies that person may receive.",
                     "Record the signed agreement if required, then save.",
+                    "Signal Access sends a private connection check addressed only to that device. The subscriber sees confirmation without placing a trade.",
                     "Send a synthetic entry and exit before any live use."]),
           p("Revocation", "H2x"),
           p("Removing a strategy or disabling a subscriber stops new entries from being encrypted to that device. A subscriber who already entered a position continues receiving the corresponding exit, preventing revocation from stranding an open trade."),
@@ -313,12 +331,14 @@ trouble = [[p("Problem", "Smallx"), p("What to do", "Smallx")],
            [p("Mac says damaged or cannot verify", "Smallx"), p("Run chmod and xattr commands from section 6 against the correct architecture file.", "Smallx")],
            [p("Bad CPU type", "Smallx"), p("Delete the file and download the other Mac architecture.", "Smallx")],
            [p("No such file or directory", "Smallx"), p("Check Downloads and remove any (1) suffix by downloading once cleanly.", "Smallx")],
-           [p("No signals", "Smallx"), p("Keep the app running; confirm Andre added the current TV1- code and granted that strategy.", "Smallx")],
+           [p("Still says Waiting for Andre", "Smallx"), p("Leave the app open for one minute. Andre should open Signal Access, verify the exact TV1- device, and press the private connection check. If this is an upgrade, do not create another identity.", "Smallx")],
+           [p("No signals", "Smallx"), p("Check for a recent private connection check first. Only new live filled short-term trades are eligible; paper activity and Long Term activity are intentionally not published.", "Smallx")],
+           [p("Mac time warning / SSL certificate", "Smallx"), p("The copier keeps retrying authoritative time sources. Update macOS and system certificates, verify Date & Time is automatic, then restart. Do not rely on a custom entry-hours window until the warning clears; exits are never blocked by the clock.", "Smallx")],
            [p("Fingerprint changed", "Smallx"), p("Stop. Confirm with Andre by phone before accepting any change.", "Smallx")],
            [p("Schwab connection expired", "Smallx"), p("Reconnect immediately. No entry or exit can be submitted until authorization is restored.", "Smallx")],
            [p("Uncertain order", "Smallx"), p("Open Schwab and inspect orders and positions. Do not resubmit automatically.", "Smallx")]]
 t = Table(trouble, colWidths=[1.8 * inch, 4.6 * inch], repeatRows=1)
-t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), NAVY), ("TEXTCOLOR", (0, 0), (-1, 0), colors.white), ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, PANEL]), ("GRID", (0, 0), (-1, -1), .5, colors.HexColor("#bdced7")), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 7), ("RIGHTPADDING", (0, 0), (-1, -1), 7), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
+t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), PANEL2), ("TEXTCOLOR", (0, 0), (-1, 0), colors.white), ("ROWBACKGROUNDS", (0, 1), (-1, -1), [PANEL, PANEL2]), ("GRID", (0, 0), (-1, -1), .5, LINE), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 7), ("RIGHTPADDING", (0, 0), (-1, -1), 7), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
 story += [t, p("If you are confused while holding a real position, the safe move is to check Schwab, close the position if appropriate, and call Andre. Your Schwab account remains the final source of truth.", "Danger"), PageBreak()]
 
 story += heading("Security and storage", "Appendix")
@@ -336,7 +356,7 @@ story += [p("Local folder", "H2x"),
           bullets(["The complete TV1- device code shown by the copier.",
                    "A redacted screenshot of a non-secret error page or the app log when requested."]),
           Spacer(1, .25 * inch),
-          p("Trading Copier - Setup and Use Guide. Revised 14 August 2026 for agent version 0.13.4. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
+          p("Trading Copier - Setup and Use Guide. Revised 14 August 2026 for agent version 0.13.7. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
           p("Copyright 2026 Walkers Software LLC. All rights reserved.", "Smallx")]
 
 
