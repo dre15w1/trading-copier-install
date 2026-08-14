@@ -11,7 +11,11 @@ def test_page_offers_both_mac_architectures() -> None:
     assert 'data-asset="copier-agent-macos-intel"' in PAGE
     assert "Apple Silicon (M1 or later)" in PAGE
     assert "Intel processor" in PAGE
-    assert PAGE.count("Update temporarily unavailable") == 2
+    assert "Update temporarily unavailable" not in PAGE
+    assert 'id="dl-mac-arm" href="#" aria-disabled="true"' not in PAGE
+    assert 'id="dl-mac-intel" href="#" aria-disabled="true"' not in PAGE
+    assert "Download for Apple Silicon" in PAGE
+    assert "Download for Intel Mac" in PAGE
 
 
 def test_windows_download_uses_the_friendly_installer() -> None:
