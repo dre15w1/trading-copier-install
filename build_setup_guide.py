@@ -1,4 +1,4 @@
-"""Build the public Trading Copier v0.9.0 setup guide."""
+"""Build the public Trading Copier v0.13.2 setup guide."""
 
 from pathlib import Path
 
@@ -37,7 +37,7 @@ class GuideDoc(BaseDocTemplate):
     def __init__(self, filename: str):
         super().__init__(filename, pagesize=letter, rightMargin=54, leftMargin=54,
                          topMargin=58, bottomMargin=52,
-                         title="Trading Copier - Setup and Use Guide v0.9.0",
+                         title="Trading Copier - Setup and Use Guide v0.13.2",
                          author="Walkers Software LLC")
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height,
                       id="normal")
@@ -50,7 +50,7 @@ class GuideDoc(BaseDocTemplate):
         canvas.line(54, 40, letter[0] - 54, 40)
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(MUTED)
-        canvas.drawString(54, 27, "Trading Copier v0.9.0 - Setup and Use Guide")
+        canvas.drawString(54, 27, "Trading Copier v0.13.2 - Setup and Use Guide")
         canvas.drawRightString(letter[0] - 54, 27, f"Page {doc.page}")
         canvas.restoreState()
 
@@ -120,7 +120,7 @@ logo.hAlign = "CENTER"
 cover_content = [Spacer(1, 0.7 * inch), logo, Spacer(1, 0.7 * inch),
                  p("Trading Copier", "CoverTitle"),
                  p("Setup and Use Guide", "CoverTitle"), Spacer(1, 0.15 * inch),
-                 p("Agent version 0.9.0", "CoverSub"),
+                 p("Agent version 0.13.2", "CoverSub"),
                  p("Windows, Mac Apple Silicon, and Mac Intel", "CoverSub"),
                  Spacer(1, 0.55 * inch),
                  p("Revised 13 August 2026", "CoverSub")]
@@ -147,10 +147,10 @@ story += [numbered([
     "Create your personal Schwab developer app and wait until Schwab marks it <b>Ready for Use</b>.",
     "Open the official installation page, read the disclosures, sign the agreement, and choose the download for your computer.",
     "Run the copier. It opens a local setup page at <b>http://127.0.0.1:8765</b>.",
-    "Enter your name. The app creates your key locally and displays a <b>TV1- device code</b>.",
+    "The app creates its private connection locally and displays one <b>TV1- device code</b>.",
     "Click <b>Copy device code</b> and send the complete TV1- code to Andre. Never send your Schwab secret or private key.",
-    "Andre opens Signal Access, pastes your code, confirms the fingerprint, and grants specific strategies.",
-    "Confirm Andre's publisher fingerprint by phone, connect Schwab, choose limits, and leave <b>Approve first</b> selected.",
+    "Andre opens Signal Access, pastes your code, and grants specific strategies.",
+    "Wait for the app to confirm the link, connect Schwab, choose limits, and leave <b>Approve first</b> selected.",
     "Receive a synthetic test entry and exit before considering live execution.",
     "Enable start at login and prevent the computer from sleeping during market hours.",
 ]),
@@ -173,7 +173,7 @@ story += [t, p("The callback must match exactly. A trailing slash, localhost in 
 story += heading("Download the correct app", "Section 4")
 story += [p("Use the official installation page. The three downloads are separate because Windows and the two Mac CPU families require different native executables."),
           p("Windows 10 or 11 - 64-bit", "H2x"),
-          p("https://github.com/dre15w1/trading-copier-install/releases/latest/download/copier-agent-windows.exe", "Codex"),
+          p("https://github.com/dre15w1/trading-copier-install/releases/latest/download/Trading-Copier-Setup.exe", "Codex"),
           p("Mac with Apple Silicon - M1, M2, M3, M4, or newer", "H2x"),
           p("https://github.com/dre15w1/trading-copier-install/releases/latest/download/copier-agent-macos-apple-silicon", "Codex"),
           p("Mac with an Intel processor", "H2x"),
@@ -183,12 +183,12 @@ story += [p("Use the official installation page. The three downloads are separat
 
 story += heading("Run it on Windows", "Section 5")
 story += [numbered(["Open your Downloads folder.",
-                    "Double-click <b>copier-agent-windows.exe</b>.",
+                    "Double-click <b>Trading-Copier-Setup.exe</b> and follow the installer.",
                     "If Windows SmartScreen appears, verify the filename, select <b>More info</b>, then <b>Run anyway</b>.",
                     "Your browser opens <b>http://127.0.0.1:8765</b>. That address means the page is served only by your own computer."]),
           p("Practice mode", "H2x"),
           p("Open PowerShell and run:", "Bodyx"),
-          p('&amp; "$env:USERPROFILE\\Downloads\\copier-agent-windows.exe" --dry-run', "Codex"),
+          p('&amp; "$env:LOCALAPPDATA\\Programs\\Trading Copier\\Trading Copier.exe" --dry-run', "Codex"),
           p("Practice mode receives signals and exercises the workflow but sends no real order to Schwab. Confirm the practice banner is visible."), PageBreak()]
 
 story += heading("Run it on a Mac", "Section 6")
@@ -198,41 +198,39 @@ story += [p("Download the correct Mac build first. Open Terminal, paste the full
           p('"$FILE" --dry-run', "Codex"),
           p("If Terminal says No such file or directory, confirm the file is in Downloads and that its name has no (1) suffix. If it says Bad CPU type in executable, you downloaded the wrong Mac architecture; delete it and choose the other Mac button.", "Callout"), PageBreak()]
 
-story += heading("Setup wizard - steps 1 and 2", "Section 7")
-story += [p("Step 1 - Welcome", "H2x"), p("Read the summary, confirm you understand that this is your account and risk, then continue."),
-          p("Step 2 - About you and your device code", "H2x"),
-          numbered(["Enter your name and optional contact details.",
-                    "Use the subscriber/device identifier Andre supplied, or allow the app to create one.",
-                    "Click <b>Save and make my key</b>.",
-                    "Click <b>Copy device code</b>. The complete value begins with <b>TV1-</b>.",
-                    "Send the complete TV1- code to Andre. Keep the app open while he adds you."]),
+story += heading("Setup wizard - device and Schwab", "Section 7")
+story += [p("Step 1 - Connect to Andre", "H2x"),
+          numbered(["The app creates its private connection automatically.",
+                    "Click <b>Copy code</b>. The complete value begins with <b>TV1-</b>.",
+                    "Send the complete TV1- code to Andre. No signal key is entered or sent.",
+                    "Keep the app open. It advances automatically after Andre links the device."]),
           p("Do not send screenshots of Schwab credentials. Do not send files from the .trading-copier folder. Andre needs only the TV1- device code for signal access.", "Danger"),
           p("If you replace your computer, the new installation gets a new code. Send the new TV1- code to Andre so he can replace the old device. The old computer then stops receiving future entries."), PageBreak()]
 
-story += heading("Setup wizard - steps 3 through 6", "Section 8")
-story += [p("Step 3 - Confirm Andre", "H2x"),
-          bullets(["Use the public signal-bus address supplied in the app or by Andre.",
-                   "Confirm Andre's publisher fingerprint by voice or a phone number you dialed.",
-                   "Do not accept a changed fingerprint merely because a message tells you to."]),
-          p("Step 4 - Connect Schwab", "H2x"),
+story += heading("Setup wizard - account and limits", "Section 8")
+story += [p("Signal connection", "H2x"),
+          bullets(["The signal source and Andre's verification key are built into the app.",
+                   "Subscribers never enter a repository address or publisher key.",
+                   "The app rejects signals that do not match the built-in verification key."]),
+          p("Step 2 - Connect Schwab", "H2x"),
           bullets(["Paste your App Key and Secret from your approved Schwab developer app.",
                    "Keep the callback URL identical to the registered value.",
                    "Click Connect Schwab, sign in on Schwab's website, and approve.",
                    "If the browser does not return automatically, copy the entire callback address and use the setup page's paste box."]),
-          p("Step 5 - Choose limits", "H2x"),
+          p("Step 3 - Choose the account", "H2x"),
+          bullets(["Choose the intended Schwab account. Other accounts are left alone."]),
+          p("Step 4 - Choose limits", "H2x"),
           bullets(["Start with a small risk percentage and low maximum position count.",
                    "Leave Approve first selected. Automatic execution requires a separate acknowledgement.",
                    "Keep publisher exits enabled so an accepted trade can be closed when Andre closes it."]),
-          p("Step 6 - Finish", "H2x"),
-          bullets(["Confirm the publisher fingerprint is verified.",
-                   "Confirm Schwab is connected to the intended account.",
+          p("Step 5 - Finish", "H2x"),
+          bullets(["Confirm Schwab is connected to the intended account.",
                    "Enable start at login and keep the computer awake."]), PageBreak()]
 
 story += heading("What Andre does in Signal Access", "Section 9")
 story += [p("On Andre's computer, Signal Access runs locally at http://127.0.0.1:8788. It is not a public website."),
           numbered(["Click <b>Add someone</b>.",
                     "Paste the friend's complete TV1- device code.",
-                    "Confirm the device fingerprint with the friend.",
                     "Select the strategies that person may receive.",
                     "Record the signed agreement if required, then save.",
                     "Send a synthetic entry and exit before any live use."]),
@@ -247,7 +245,7 @@ story += [numbered(["Keep the subscriber app in practice mode and Approve first 
                     "Approve it and confirm no real Schwab order is sent in practice mode.",
                     "Confirm the matching synthetic exit arrives.",
                     "Restart the app and confirm it opens normally and still shows the same TV1- device code in Settings."]),
-          p("Do not switch to live execution if the test entry or exit is missing, the publisher fingerprint is unconfirmed, Schwab shows the wrong account, or the app reports an uncertain order.", "Danger"),
+          p("Do not switch to live execution if the test entry or exit is missing, Schwab shows the wrong account, or the app reports an uncertain order.", "Danger"),
           p("After practice", "H2x"),
           p("Watch the system for several sessions. When you intentionally leave practice mode, keep Approve first enabled and start with the smallest sensible risk."), PageBreak()]
 
@@ -336,10 +334,9 @@ story += [p("Local folder", "H2x"),
                    "Remote-control access to the computer while Schwab is open."]),
           p("Safe to share with Andre", "H2x"),
           bullets(["The complete TV1- device code shown by the copier.",
-                   "The publisher/device fingerprint read aloud for confirmation.",
                    "A redacted screenshot of a non-secret error page or the app log when requested."]),
           Spacer(1, .25 * inch),
-          p("Trading Copier - Setup and Use Guide. Revised 13 August 2026 for agent version 0.9.0. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
+          p("Trading Copier - Setup and Use Guide. Revised 13 August 2026 for agent version 0.13.2. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
           p("Copyright 2026 Walkers Software LLC. All rights reserved.", "Smallx")]
 
 

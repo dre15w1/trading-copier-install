@@ -11,11 +11,19 @@ def test_page_offers_both_mac_architectures() -> None:
     assert 'data-asset="copier-agent-macos-intel"' in PAGE
     assert "Apple Silicon (M1 or later)" in PAGE
     assert "Intel processor" in PAGE
+    assert PAGE.count("Update temporarily unavailable") == 2
+
+
+def test_windows_download_uses_the_friendly_installer() -> None:
+    assert 'data-asset="Trading-Copier-Setup.exe"' in PAGE
+    assert 'data-asset="copier-agent-windows.exe"' not in PAGE
 
 
 def test_page_explains_device_code_onboarding() -> None:
     assert "Copy device code" in PAGE
     assert "TV1-" in PAGE
+    assert "You never enter or send a signal key" in PAGE
+    assert "six setup" not in PAGE
 
 
 def test_mac_commands_choose_the_download_for_this_cpu() -> None:

@@ -475,7 +475,7 @@
   <section>
     <h2>Step 2 &mdash; Download</h2>
     <div class="dl-grid locked" id="dl-grid">
-      <a class="dl" id="dl-win" href="#" data-asset="copier-agent-windows.exe">
+      <a class="dl" id="dl-win" href="#" data-asset="Trading-Copier-Setup.exe">
         <span class="os">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 10 4.6v6.9H3zM11 4.45 21 3v8.5H11zM3 12.5h7v6.9L3 18.5zM11 12.5h10V21l-10-1.45z"/></svg>
           Windows
@@ -485,24 +485,26 @@
         <span class="meta" id="meta-win">Loading…</span>
       </a>
 
-      <a class="dl" id="dl-mac-arm" href="#" data-asset="copier-agent-macos-apple-silicon">
+      <a class="dl unavailable" id="dl-mac-arm" href="#" aria-disabled="true"
+         style="pointer-events:none;opacity:.55" data-asset="copier-agent-macos-apple-silicon">
         <span class="os">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.5-.15-2.85.85-3.6.85s-1.9-.83-3.1-.81c-1.6.03-3.05.93-3.87 2.35-1.65 2.86-.42 7.1 1.19 9.42.79 1.14 1.73 2.42 2.96 2.37 1.19-.05 1.64-.77 3.08-.77s1.85.77 3.1.74c1.28-.02 2.09-1.16 2.87-2.3.9-1.32 1.27-2.6 1.29-2.66-.03-.01-2.48-.95-2.5-3.78zM14 5.4c.66-.8 1.1-1.9.98-3-.95.04-2.1.63-2.78 1.42-.61.7-1.14 1.83-1 2.9 1.06.08 2.14-.54 2.8-1.32z"/></svg>
           macOS — Apple Silicon
         </span>
         <span class="muted" style="font-size:14px">macOS 12 or newer · Apple Silicon (M1 or later)</span>
-        <span class="cta">Download for M-series Mac</span>
-        <span class="meta" id="meta-mac-arm">Loading…</span>
+        <span class="cta">Update temporarily unavailable</span>
+        <span class="meta" id="meta-mac-arm">GitHub Mac builder unavailable</span>
       </a>
 
-      <a class="dl" id="dl-mac-intel" href="#" data-asset="copier-agent-macos-intel">
+      <a class="dl unavailable" id="dl-mac-intel" href="#" aria-disabled="true"
+         style="pointer-events:none;opacity:.55" data-asset="copier-agent-macos-intel">
         <span class="os">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.5-.15-2.85.85-3.6.85s-1.9-.83-3.1-.81c-1.6.03-3.05.93-3.87 2.35-1.65 2.86-.42 7.1 1.19 9.42.79 1.14 1.73 2.42 2.96 2.37 1.19-.05 1.64-.77 3.08-.77s1.85.77 3.1.74c1.28-.02 2.09-1.16 2.87-2.3.9-1.32 1.27-2.6 1.29-2.66-.03-.01-2.48-.95-2.5-3.78zM14 5.4c.66-.8 1.1-1.9.98-3-.95.04-2.1.63-2.78 1.42-.61.7-1.14 1.83-1 2.9 1.06.08 2.14-.54 2.8-1.32z"/></svg>
           macOS — Intel
         </span>
         <span class="muted" style="font-size:14px">macOS 12 or newer · Intel processor</span>
-        <span class="cta">Download for Intel Mac</span>
-        <span class="meta" id="meta-mac-intel">Loading…</span>
+        <span class="cta">Update temporarily unavailable</span>
+        <span class="meta" id="meta-mac-intel">GitHub Mac builder unavailable</span>
       </a>
     </div>
     <p class="muted" style="font-size:13.5px;margin-top:14px">
@@ -525,7 +527,7 @@
       <span class="guide-txt">
         <b>The setup guide (PDF)</b>
         <span class="muted">Every screen, start to finish — the Schwab app,
-          installing, the six setup steps, the weekly reconnect, and what to do
+          installing, the five setup steps, the weekly reconnect, and what to do
           when something looks wrong. Worth reading before step 1.</span>
       </span>
       <span class="cta">Read the guide</span>
@@ -687,16 +689,12 @@ xattr -d com.apple.quarantine "$FILE"
       </li>
 
       <li>
-        <h3>Work through the six setup screens</h3>
+        <h3>Work through the five setup screens</h3>
         <ul>
-          <li>Your name and contact details.</li>
-          <li>It creates your personal key and shows a <strong>TV1- device code</strong>.
-            Click <strong>Copy device code</strong> and send that code to Andre. Your private
-            key never leaves your computer.</li>
-          <li>It shows a <strong>fingerprint</strong> — four blocks of letters and numbers.
-            <strong>Call Andre and read it out loud</strong> to confirm it matches.
-            Don’t skip this and don’t do it over text; it’s the one check that proves signals
-            really came from him.</li>
+          <li>It automatically creates a private connection and shows one
+            <strong>TV1- device code</strong>. Click <strong>Copy device code</strong>
+            and send that code to Andre. You never enter or send a signal key.</li>
+          <li>Wait while Andre links that device code. The screen advances automatically.</li>
           <li>Connect your Schwab account with your client ID and secret.</li>
           <li>Set your risk limits — how much per trade, how many at once, daily stop.</li>
           <li>Choose <strong>approve each trade</strong> or <strong>place automatically</strong>.
@@ -781,7 +779,7 @@ xattr -d com.apple.quarantine "$FILE"
   // API call below succeeds -- GitHub permanently redirects
   // /releases/latest/download/<name> to the newest release, so the page never
   // needs editing when a new version ships.
-  document.querySelectorAll(".dl").forEach(function (a) {
+  document.querySelectorAll(".dl:not(.unavailable)").forEach(function (a) {
     a.href = LATEST + a.dataset.asset;
   });
   document.getElementById("sums-link").href    = LATEST + "SHA256SUMS.txt";
@@ -820,12 +818,12 @@ xattr -d com.apple.quarantine "$FILE"
         }
         return null;
       }
-      var w = sizeOf("copier-agent-windows", false);
+      var w = sizeOf("Trading-Copier-Setup", false);
       var ma = sizeOf("copier-agent-macos-apple-silicon", true);
       var mi = sizeOf("copier-agent-macos-intel", true);
       setText("meta-win", w ? human(w) + " · v" + tag : "v" + tag);
-      setText("meta-mac-arm", ma ? human(ma) + " · v" + tag : "v" + tag);
-      setText("meta-mac-intel", mi ? human(mi) + " · v" + tag : "v" + tag);
+      if (ma) setText("meta-mac-arm", human(ma) + " · v" + tag);
+      if (mi) setText("meta-mac-intel", human(mi) + " · v" + tag);
     })
     .catch(function () {
       setText("meta-win", "Latest release");
