@@ -1,4 +1,4 @@
-"""Build the public Trading Copier v0.13.3 setup guide."""
+"""Build the public Trading Copier v0.13.4 setup guide."""
 
 from pathlib import Path
 
@@ -37,7 +37,7 @@ class GuideDoc(BaseDocTemplate):
     def __init__(self, filename: str):
         super().__init__(filename, pagesize=letter, rightMargin=54, leftMargin=54,
                          topMargin=58, bottomMargin=52,
-                         title="Trading Copier - Setup and Use Guide v0.13.3",
+                         title="Trading Copier - Setup and Use Guide v0.13.4",
                          author="Walkers Software LLC")
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height,
                       id="normal")
@@ -50,7 +50,7 @@ class GuideDoc(BaseDocTemplate):
         canvas.line(54, 40, letter[0] - 54, 40)
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(MUTED)
-        canvas.drawString(54, 27, "Trading Copier v0.13.3 - Setup and Use Guide")
+        canvas.drawString(54, 27, "Trading Copier v0.13.4 - Setup and Use Guide")
         canvas.drawRightString(letter[0] - 54, 27, f"Page {doc.page}")
         canvas.restoreState()
 
@@ -120,7 +120,7 @@ logo.hAlign = "CENTER"
 cover_content = [Spacer(1, 0.7 * inch), logo, Spacer(1, 0.7 * inch),
                  p("Trading Copier", "CoverTitle"),
                  p("Setup and Use Guide", "CoverTitle"), Spacer(1, 0.15 * inch),
-                 p("Agent version 0.13.3", "CoverSub"),
+                 p("Agent version 0.13.4", "CoverSub"),
                  p("Windows, Mac Apple Silicon, and Mac Intel", "CoverSub"),
                  Spacer(1, 0.55 * inch),
                  p("Revised 13 August 2026", "CoverSub")]
@@ -336,7 +336,7 @@ story += [p("Local folder", "H2x"),
           bullets(["The complete TV1- device code shown by the copier.",
                    "A redacted screenshot of a non-secret error page or the app log when requested."]),
           Spacer(1, .25 * inch),
-          p("Trading Copier - Setup and Use Guide. Revised 13 August 2026 for agent version 0.13.3. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
+          p("Trading Copier - Setup and Use Guide. Revised 14 August 2026 for agent version 0.13.4. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Smallx"),
           p("Copyright 2026 Walkers Software LLC. All rights reserved.", "Smallx")]
 
 
