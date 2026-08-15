@@ -15,7 +15,6 @@ from reportlab.platypus import (
     Flowable,
     Frame,
     Image,
-    KeepTogether,
     ListFlowable,
     ListItem,
     PageBreak,
@@ -31,7 +30,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / "manual-assets"
 OUT = ROOT / "Trading-Copier-Setup-Guide.pdf"
-VERSION = "0.13.7"
+VERSION = "0.13.9"
 
 BG = colors.HexColor("#0d1117")
 PANEL = colors.HexColor("#161b22")
@@ -54,9 +53,9 @@ class ManualDoc(BaseDocTemplate):
             leftMargin=48,
             topMargin=55,
             bottomMargin=52,
-            title=f"Trading Copier Installation Guide and User Manual v{VERSION}",
+            title=f"Trading Copier Installation Guide and User Manual v{VERSION} / schema v2",
             author="Walkers Software LLC",
-            subject="Beginner installation, operation, trading concepts, and strategy manual",
+            subject="Beginner installation, operation, schema v2 multi-leg options, trading concepts, and strategy manual",
         )
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id="normal")
         self.addPageTemplates(PageTemplate(id="manual", frames=[frame], onPage=self._decorate))
@@ -282,7 +281,7 @@ cover = Table([[[hero, Spacer(1, .28 * inch), p("Trading Copier", "CoverTitle"),
                  Spacer(1, .05 * inch),
                  p(f"Version {VERSION} / Windows and macOS", "CoverSub"),
                  p("Written for first-time investors and first-time copier users", "CoverSub"),
-                 p("Revised 14 August 2026", "CoverSub")]]],
+                 p("Revised 15 August 2026 / schema v2 multi-leg paper support", "CoverSub")]]],
               colWidths=[letter[0] - 96], rowHeights=[6.9 * inch])
 cover.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), BG),
                            ("BOX", (0, 0), (-1, -1), 1, LINE),
@@ -633,7 +632,85 @@ story += [section("Before the market each day"),
                    "Save a redacted screenshot and the agent.log file for support."], numbered=True),
           p("Closing the browser tab does not quit the copier. Use Quit Copier in the footer. Done for the day blocks new entries but keeps exits active.", "Warn"), PageBreak()]
 
-story += chapter("Troubleshooting", "PART 8 / FIX COMMON PROBLEMS")
+story += chapter("Atomic multi-leg option groups", "PART 8 / SCHEMA V2")
+story += [p("Version 0.13.9 keeps every schema v1 single-contract workflow and adds schema v2 for complete two-leg and four-leg option position groups. A group is one risk-defined position. The copier never turns it into separate single-leg trades."),
+          p("Current release boundary", "Section"),
+          p("Schema-v2 <b>paper</b> signals are authenticated, validated, simulated, persisted, and displayed. They call zero broker methods. Live multi-leg signals are rejected because this build does not yet have independently proven Schwab native complex-order support. No leg is sent. Paper qualification is not evidence of profitability or live readiness.", "Warn"),
+          two_col([["Badge", "Meaning"],
+                   ["PAPER", "Complete group simulation only; the broker is never called."],
+                   ["LIVE", "Would require entitlement, explicit live acknowledgement, account permission, exact contracts, and a proven native complex-order adapter. Currently rejected."],
+                   ["schema v1", "Existing single stock or single option behavior remains unchanged."],
+                   ["schema v2", "Two-leg vertical or four-leg iron structure; never downgraded to v1."]]),
+          section("Safety rules that cannot be bypassed"),
+          bullets(["No sequential legging and no market-order entry.",
+                   "No expiry, strike, right, ratio, multiplier, or contract substitution.",
+                   "A missing protective wing rejects the complete signal.",
+                   "Unknown schema versions, structures, actions, or intents are recorded as rejected; nothing is guessed.",
+                   "Stale, crossed, incomplete, expired, or economically inconsistent groups are rejected.",
+                   "Duplicate event, signal, and group IDs cannot create a second group.",
+                   "An ambiguous or partial live response would stop in UNCERTAIN and reconcile before any retry."]), PageBreak()]
+
+story += chapter("Supported structures and leg map", "PART 8A / VISUAL GUIDE")
+story += [p("Labels and action names matter more than color. Long/protective legs are marked BUY; short/premium legs are marked SELL."),
+          two_col([["Structure", "Required strike geometry and opening legs"],
+                   ["Bull-put credit vertical", "LOW: BUY_TO_OPEN long put  |  HIGH: SELL_TO_OPEN short put"],
+                   ["Bear-call credit vertical", "LOW: SELL_TO_OPEN short call  |  HIGH: BUY_TO_OPEN long call"],
+                   ["Bull-call debit vertical", "LOW: BUY_TO_OPEN long call  |  HIGH: SELL_TO_OPEN short call"],
+                   ["Bear-put debit vertical", "LOW: SELL_TO_OPEN short put  |  HIGH: BUY_TO_OPEN long put"],
+                   ["Iron condor", "long put < short put < short call < long call; all four legs required"],
+                   ["Iron butterfly", "long put < shared short center < long call; both short rights at center"]], widths=(2.15 * inch, 4.35 * inch)),
+          section("Two-leg diagram"),
+          two_col([["LOWER STRIKE", "HIGHER STRIKE"],
+                   ["BUY long protective put", "SELL short put"],
+                   ["6395 PUT / BUY_TO_OPEN", "6400 PUT / SELL_TO_OPEN"]], widths=(3.25 * inch, 3.25 * inch)),
+          p("BULL-PUT CREDIT VERTICAL: the lower long put is the protective wing. If either contract is missing, duplicated, or has the wrong expiry, the entire group is rejected.", "Warn"),
+          section("Four-leg diagram"),
+          two_col([["LONG PUT", "SHORT PUT  |  SHORT CALL  |  LONG CALL"],
+                   ["BUY wing below", "SELL inner put  |  SELL inner call  |  BUY wing above"],
+                   ["6390 P", "6395 P  <  6405 C  <  6410 C"]], widths=(2 * inch, 4.5 * inch)),
+          p("IRON CONDOR: the strikes must remain in strict order and every leg must share the same underlying and expiry.", "Warn"), PageBreak()]
+
+story += chapter("Net prices, actions, and risk display", "PART 8B / READ THE CARD")
+story += [two_col([["Lifecycle", "Native group order", "Long-leg action", "Short-leg action"],
+                   ["Credit open", "NET_CREDIT", "BUY_TO_OPEN", "SELL_TO_OPEN"],
+                   ["Credit close", "NET_DEBIT", "SELL_TO_CLOSE", "BUY_TO_CLOSE"],
+                   ["Debit open", "NET_DEBIT", "BUY_TO_OPEN", "SELL_TO_OPEN"],
+                   ["Debit close", "NET_CREDIT", "SELL_TO_CLOSE", "BUY_TO_CLOSE"]], widths=(1.25 * inch, 1.4 * inch, 1.9 * inch, 1.9 * inch)),
+          p("All net prices are positive USD-per-share magnitudes. Option cash equals net price x multiplier x group quantity. A negative or zero limit is invalid; the copier never infers debit or credit from a sign."),
+          section("What the group card shows"),
+          bullets(["Strategy, underlying, structure, expiry, PAPER/LIVE badge, and group state.",
+                   "Every OCC contract, option right, strike, open/close action, ratio, and leg status.",
+                   "Group quantity, NET_CREDIT or NET_DEBIT limit, multiplier, and quote age.",
+                   "Maximum gain, maximum loss, and buying-power reservation recomputed from the structure.",
+                   "Forced-exit time, settlement warning, and durable rejection or reconciliation detail."], numbered=True),
+          p("Maximum gain and loss are per complete group. Quantity multiplies the complete structure. Never multiply only one leg when checking exposure.", "Danger"), PageBreak()]
+
+story += chapter("Multi-leg workflow and status runbook", "PART 8C / OPERATE SAFELY")
+story += [bullets(["Publisher creates an explicit schema-v2 group; it does not pass through v1 normalization.",
+                   "Publisher filters by strategy entitlement and explicit schema-v2 paper capability.",
+                   "Subscriber verifies the signature, decrypts, claims the event idempotently, and validates the complete structure.",
+                   "Paper mode simulates and stores every leg in one transaction, then shows one group card.",
+                   "A group exit closes the verified complete paper group. No per-leg buttons are offered."], numbered=True),
+          two_col([["State", "Meaning and trader action"],
+                   ["PENDING_APPROVAL", "Complete group is waiting for a deliberate review; approving applies to the group."],
+                   ["OPENING", "One native complex order would be in progress. Do not submit another."],
+                   ["OPEN", "Complete group is held and monitored as one position."],
+                   ["CLOSING", "Whole-group closing order is in progress."],
+                   ["CLOSED", "All verified group quantity is closed."],
+                   ["REJECTED", "Nothing was traded; read the human-readable reason."],
+                   ["PARTIAL_UNWIND", "A partial-fill recovery is underway; do not add exposure."],
+                   ["UNCERTAIN", "Stop. Inspect Schwab orders and positions; never retry or trade an individual leg."]]),
+          section("Common rejection and recovery cases"),
+          bullets(["Unsupported account or permissions: no order; confirm complex-options approval with the broker.",
+                   "Unresolved exact contract or missing wing: reject the complete group.",
+                   "Stale/crossed quote or expired event: reject; do not refresh into a different trade.",
+                   "Buying-power or risk mismatch: reject; reduce risk at the source rather than deleting a wing.",
+                   "Duplicate event: show the prior outcome; never submit twice.",
+                   "Position mismatch or ambiguous submission: mark UNCERTAIN and reconcile against broker truth.",
+                   "Restart during a transitional live state: recover open orders, order history, and holdings before processing another event.",
+                   "Missed forced exit: treat as an emergency; inspect and close the complete verified group in Schwab."]), PageBreak()]
+
+story += chapter("Troubleshooting", "PART 9 / FIX COMMON PROBLEMS")
 story += [two_col([
               ["What you see", "What to do"],
               ["Waiting for Andre", "Leave it open for one minute. Andre must link the exact current TV1- code and send the private connection check. Do not create another identity during an update."],
@@ -649,7 +726,7 @@ story += [two_col([
           ]),
           p("If a real position is open and the app is confusing, Schwab is the source of truth. Protect the account first; troubleshoot second.", "Danger"), PageBreak()]
 
-story += chapter("Glossary", "PART 9 / QUICK REFERENCE")
+story += chapter("Glossary", "PART 10 / QUICK REFERENCE")
 story += [two_col([
               ["Word", "Meaning"],
               ["0DTE", "An option expiring today. It can move or lose value extremely quickly."],
@@ -683,7 +760,7 @@ story += [section("Never share"),
           p("Windows: C:\\Users\\&lt;you&gt;\\.trading-copier\\<br/>macOS: ~/.trading-copier/", "CodeX"),
           p("This folder preserves identity and settings across normal upgrades. Back it up securely. Do not email it."),
           Spacer(1, .2 * inch),
-          p(f"Trading Copier Installation Guide and User Manual. Revised 14 August 2026 for version {VERSION}. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Small"),
+          p(f"Trading Copier Installation Guide and User Manual. Revised 15 August 2026 for version {VERSION}, application schema v1 and multi-leg schema v2. Source: build_user_manual.py. The software and this document are provided as-is, without warranty. Nothing here is investment advice. Trading involves risk of loss.", "Small"),
           p("Copyright 2026 Walkers Software LLC. All rights reserved.", "Small")]
 
 story += [PageBreak()] + chapter("Authoritative investor references", "APPENDIX")
