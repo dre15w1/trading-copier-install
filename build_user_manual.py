@@ -30,7 +30,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / "manual-assets"
 OUT = ROOT / "Trading-Copier-Setup-Guide.pdf"
-VERSION = "0.13.9"
+VERSION = "0.13.10"
 
 BG = colors.HexColor("#0d1117")
 PANEL = colors.HexColor("#161b22")
@@ -633,7 +633,7 @@ story += [section("Before the market each day"),
           p("Closing the browser tab does not quit the copier. Use Quit Copier in the footer. Done for the day blocks new entries but keeps exits active.", "Warn"), PageBreak()]
 
 story += chapter("Atomic multi-leg option groups", "PART 8 / SCHEMA V2")
-story += [p("Version 0.13.9 keeps every schema v1 single-contract workflow and adds schema v2 for complete two-leg and four-leg option position groups. A group is one risk-defined position. The copier never turns it into separate single-leg trades."),
+story += [p(f"Version {VERSION} keeps every schema v1 single-contract workflow and adds schema v2 for complete two-leg and four-leg option position groups. A group is one risk-defined position. The copier never turns it into separate single-leg trades."),
           p("Current release boundary", "Section"),
           p("Schema-v2 <b>paper</b> signals are authenticated, validated, simulated, persisted, and displayed. They call zero broker methods. Live multi-leg signals are rejected because this build does not yet have independently proven Schwab native complex-order support. No leg is sent. Paper qualification is not evidence of profitability or live readiness.", "Warn"),
           two_col([["Badge", "Meaning"],
