@@ -30,7 +30,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / "manual-assets"
 OUT = ROOT / "Trading-Copier-Setup-Guide.pdf"
-VERSION = "0.13.10"
+VERSION = "0.13.11"
 
 BG = colors.HexColor("#0d1117")
 PANEL = colors.HexColor("#161b22")
@@ -635,10 +635,10 @@ story += [section("Before the market each day"),
 story += chapter("Atomic multi-leg option groups", "PART 8 / SCHEMA V2")
 story += [p(f"Version {VERSION} keeps every schema v1 single-contract workflow and adds schema v2 for complete two-leg and four-leg option position groups. A group is one risk-defined position. The copier never turns it into separate single-leg trades."),
           p("Current release boundary", "Section"),
-          p("Schema-v2 <b>paper</b> signals are authenticated, validated, simulated, persisted, and displayed. They call zero broker methods. Live multi-leg signals are rejected because this build does not yet have independently proven Schwab native complex-order support. No leg is sent. Paper qualification is not evidence of profitability or live readiness.", "Warn"),
+          p("Schema-v2 <b>paper</b> signals are authenticated, validated, simulated, persisted, and displayed. They call zero broker methods. A live group is eligible only after entitlement, local Auto execute acknowledgement, exact-contract validation, account and buying-power checks, and maximum-loss checks. The copier then sends every leg in <b>one native complex-order</b> request to Schwab. It never submits legs one at a time.", "Warn"),
           two_col([["Badge", "Meaning"],
                    ["PAPER", "Complete group simulation only; the broker is never called."],
-                   ["LIVE", "Would require entitlement, explicit live acknowledgement, account permission, exact contracts, and a proven native complex-order adapter. Currently rejected."],
+                   ["LIVE", "Requires entitlement, explicit Auto execute acknowledgement, option permission, exact contracts, and local risk capacity. One complete complex order is submitted; Schwab accepts or rejects the package."],
                    ["schema v1", "Existing single stock or single option behavior remains unchanged."],
                    ["schema v2", "Two-leg vertical or four-leg iron structure; never downgraded to v1."]]),
           section("Safety rules that cannot be bypassed"),
