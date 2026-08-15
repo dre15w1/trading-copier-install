@@ -224,6 +224,54 @@ class ConnectionDiagram(Flowable):
         c.drawString(0, .14 * inch, "The private key and Schwab credentials never leave the subscriber's computer.")
 
 
+class CredentialDiagram(Flowable):
+    """Show which credential is created where and where it may travel."""
+
+    def __init__(self):
+        super().__init__()
+        self.width = 6.65 * inch
+        self.height = 3.15 * inch
+
+    def draw(self):
+        c = self.canv
+        rows = [
+            ("Schwab username + password", "Already owned by subscriber", "Typed only on Schwab's website", RED),
+            ("App Key / Client ID", "Created in Schwab Developer Portal", "Pasted into this subscriber's copier", BLUE),
+            ("Secret / Client Secret", "Created in Schwab Developer Portal", "Pasted once; never sent to Andre", AMBER),
+            ("TV1- connection code", "Created by the copier", "The only code sent to Andre", GREEN),
+        ]
+        widths = (2.05 * inch, 2.15 * inch, 2.25 * inch)
+        y = 2.72 * inch
+        c.setFont("Helvetica-Bold", 8.5)
+        c.setFillColor(MUTED)
+        for x, label in zip((0, widths[0], widths[0] + widths[1]),
+                            ("ITEM", "WHERE IT COMES FROM", "WHERE IT GOES")):
+            c.drawString(x + 8, y + 10, label)
+        for name, origin, destination, accent in rows:
+            y -= .60 * inch
+            x = 0
+            for width, text_value in zip(widths, (name, origin, destination)):
+                c.setFillColor(PANEL2)
+                c.setStrokeColor(LINE)
+                c.roundRect(x, y, width - 5, .48 * inch, 5, fill=1, stroke=1)
+                c.setFillColor(accent if x == 0 else INK)
+                font_name = "Helvetica-Bold" if x == 0 else "Helvetica"
+                c.setFont(font_name, 7.8)
+                words = text_value.split()
+                lines, current = [], ""
+                for word in words:
+                    candidate = (current + " " + word).strip()
+                    if c.stringWidth(candidate, font_name, 7.8) > width - 20 and current:
+                        lines.append(current); current = word
+                    else:
+                        current = candidate
+                if current:
+                    lines.append(current)
+                for n, line in enumerate(lines[:2]):
+                    c.drawString(x + 8, y + 21 - n * 10, line)
+                x += width
+
+
 story = []
 
 # Cover
@@ -351,20 +399,99 @@ story += [section("Choose the correct Mac"),
           p("A certificate warning from the copier's time check is not a trading signal. Update macOS, verify automatic Date & Time, and restart. Do not rely on a custom entry-hours window until the warning clears. Exits are never blocked by the clock.", "Warn"), PageBreak()]
 
 story += chapter("Create the required Schwab developer app", "PART 4 / FIRST SETUP")
-story += [p("Every subscriber uses their own free Schwab developer app. Andre's Schwab key is never entered into the copier."),
+story += [p("Every subscriber uses their own Schwab developer application. Andre's Schwab key is never entered into the subscriber copier. The developer application is what allows the copier on this computer to ask Schwab for permission to place orders in the account the subscriber chooses."),
+          p("The developer account and the ordinary brokerage account are related but separate logins. Creating a developer account does not move money, open a trade, or give Andre access.", "Note"),
+          CredentialDiagram(),
+          p("The Secret is treated like a password. The TV1- code is the only one of these four items designed to be sent to Andre.", "Danger"),
+          section("Before starting"),
+          bullets(["Have access to the email address used for Schwab developer registration.",
+                   "Know the subscriber's normal Schwab brokerage login, but do not send it to Andre.",
+                   "Use the same computer that will run the copier when entering the App Key and Secret.",
+                   "Write down the exact callback URL from this manual before creating the app."], numbered=True),
+          PageBreak()]
+
+story += chapter("Schwab portal - create the developer account", "SCHWAB APP KEY / STEP 1")
+story += [p("Official starting address: <b>https://developer.schwab.com/</b>. Type or bookmark this address directly. Do not follow an API-key link sent by an unknown person."),
+          bullets(["Open the official Schwab Developer Portal.",
+                   "Choose the registration or sign-up option for an <b>Individual</b> developer account.",
+                   "Enter the requested contact information and email address.",
+                   "Open Schwab's verification email and complete the verification link.",
+                   "Return to the Developer Portal and sign in.",
+                   "If Schwab presents terms or an API agreement, read and accept them only for the subscriber's own account."], numbered=True),
+          p("The portal's button names can change slightly. Look for the path that ends at the signed-in developer dashboard and a page named <b>My Apps</b>, <b>Apps</b>, or similar. Do not use the regular schwab.com brokerage page to look for an App Key; it is created in the Developer Portal.", "Note"),
+          section("If registration does not finish"),
+          bullets(["Check spam or junk mail for the verification message.",
+                   "Make sure the verification link is opened in the same browser session.",
+                   "Turn off aggressive popup blocking for developer.schwab.com only.",
+                   "If the portal says the email already exists, use its password-recovery flow instead of creating duplicates."], numbered=True),
+          PageBreak()]
+
+story += chapter("Schwab portal - create the Trader API app", "SCHWAB APP KEY / STEP 2")
+story += [p("After signing in, open <b>My Apps</b> and choose <b>Create App</b>, <b>Add App</b>, or the equivalent new-application button."),
           two_col([
               ["Field", "What to enter"],
-              ["Product", "Trader API / Accounts and Trading Production; add Market Data Production if Schwab offers it"],
+              ["Application type", "Individual / personal use, when the portal asks"],
+              ["Product", "Trader API / Accounts and Trading Production; add Market Data Production only if the portal offers or requires it"],
               ["App name", "A simple personal name such as Jane Trading Copier"],
               ["Callback URL", "https://127.0.0.1:8182/callback, character for character"],
               ["Description", "Personal trading automation for my own self-directed account"],
           ]),
-          bullets(["Go to https://developer.schwab.com and create an Individual developer account.",
-                   "Create the app using the table above.",
-                   "Wait until Schwab marks it Ready for Use. This can take several business days.",
-                   "Copy the App Key and Secret into the copier's Schwab setup screen.",
-                   "Never send the Secret, password, callback authorization code, or screen-sharing control to Andre."], numbered=True),
-          p("A trailing slash, localhost instead of 127.0.0.1, or http instead of https can break authorization. The callback must match exactly.", "Danger"), PageBreak()]
+          bullets(["Select the Trader API or Accounts and Trading product used for an individual brokerage account.",
+                   "Enter a personal app name. It does not need to match the copier device name.",
+                   "Paste the callback URL exactly as shown in the table.",
+                   "Enter the personal-use description.",
+                   "Review every field, then submit the app for Schwab's review."], numbered=True),
+          p("A trailing slash, localhost instead of 127.0.0.1, http instead of https, a different port, or a spelling change can break authorization. Use exactly <b>https://127.0.0.1:8182/callback</b> unless the copier itself displays a different callback during setup.", "Danger"),
+          PageBreak()]
+
+story += chapter("Wait for approval, then find the App Key and Secret", "SCHWAB APP KEY / STEP 3")
+story += [p("Submitting the app does not mean it is ready immediately. Return to My Apps and watch the status. Schwab may use wording such as Pending, In Review, Approved, or Ready for Use."),
+          bullets(["Do not repeatedly delete and recreate a pending app; that can restart the process.",
+                   "Wait until Schwab marks the app <b>Ready for Use</b> or otherwise approved for production.",
+                   "Open the approved app's detail page.",
+                   "Locate the value labeled <b>App Key</b>, <b>Client ID</b>, or equivalent. These names refer to the public identifier the copier calls App Key.",
+                   "Locate the value labeled <b>Secret</b>, <b>Client Secret</b>, or equivalent.",
+                   "Use the portal's reveal or copy control if the Secret is hidden. Copy it carefully without spaces before or after it."], numbered=True),
+          p("Some portals show a Secret only once or require a regenerate action later. Save it directly into the copier rather than an email, text message, shared note, or screenshot.", "Warn"),
+          section("How to tell the two values apart"),
+          two_col([
+              ["App Key / Client ID", "Identifies which developer app is requesting access. Enter it in the copier's App Key box."],
+              ["Secret / Client Secret", "Proves the app is allowed to make that request. Enter it in the copier's Secret box. Never send it to Andre."],
+          ], header=False),
+          p("Neither value is the subscriber's Schwab password. Neither value is the TV1- connection code.", "Danger"), PageBreak()]
+
+story += chapter("Put the Schwab credentials into the copier", "SCHWAB APP KEY / STEP 4")
+story += [bullets(["Open the Trading Copier and continue to setup step 2, <b>Connect Schwab</b>.",
+                   "In <b>App Key</b>, paste the portal's App Key or Client ID.",
+                   "In <b>Secret</b>, paste the portal's Secret or Client Secret.",
+                   "In <b>Callback URL</b>, confirm the address matches the approved developer app character for character.",
+                   "Press <b>Save app details</b>.",
+                   "The Secret moves into this computer's password vault. The copier does not display it again."], numbered=True),
+          p("Do not paste the short fingerprint, TV1- code, Schwab password, or Andre's key into either Schwab credential field.", "Danger"),
+          section("Now authorize the brokerage account"),
+          bullets(["Press <b>Connect Schwab</b>.",
+                   "A browser opens Schwab's own sign-in page.",
+                   "Enter the subscriber's normal Schwab username and password on Schwab's page, not inside the copier.",
+                   "Review the authorization request and approve it.",
+                   "Return to the copier. It should show <b>Schwab is connected</b> and allow the subscriber to continue to account selection.",
+                   "If the browser does not return, copy the entire address from the browser after authorization and paste it into the copier's recovery box."], numbered=True),
+          p("A green <b>Schwab is connected</b> message is the authoritative status. The Connect Schwab button may remain available because it is also the way to reconnect later; its presence does not mean the connection failed.", "Good"),
+          PageBreak()]
+
+story += chapter("Schwab key problems and safe fixes", "SCHWAB APP KEY / TROUBLESHOOTING")
+story += [two_col([
+              ["Problem", "What to check"],
+              ["Connect button disabled", "Save both App Key and Secret first."],
+              ["Invalid client / unauthorized_client", "Confirm the App Key belongs to the approved app and was copied without spaces."],
+              ["Invalid secret", "Return to the approved app, copy the Client Secret again, or use Schwab's regenerate process and replace the saved Secret."],
+              ["Redirect or callback mismatch", "Compare scheme, 127.0.0.1, port 8182, /callback, capitalization, and trailing slash character for character."],
+              ["App still pending", "The key cannot be used for production until Schwab approves it. Wait rather than recreating it."],
+              ["Browser warning on callback", "The callback is this computer. Follow the copier's recovery instructions and paste the entire callback URL if automatic return fails."],
+              ["Connected, but expires soon", "Reconnect through the copier. Schwab normally requires periodic reauthorization."],
+              ["Changed or regenerated Secret", "Save the new Secret in the copier, then reconnect Schwab. Do not change the TV1- device identity."],
+          ]),
+          p("Support may ask for a screenshot of the portal status or callback setting. Black out the App Key, Secret, account numbers, authorization code, and personal information first. Never send the Secret even to Andre.", "Danger"),
+          PageBreak()]
 
 story += chapter("The five setup screens", "PART 4 / FIRST SETUP")
 story += [section("1. Connect to Andre"),
