@@ -1,4 +1,10 @@
-"""Build the public Trading Copier v0.13.7 setup guide."""
+"""Compatibility entry point for the detailed Trading Copier user manual."""
+
+# Existing release notes and operator habits invoke this filename.  Keep it as
+# the stable command while the detailed manual lives in a focused module.
+if __name__ == "__main__":
+    import build_user_manual  # noqa: F401  (import performs the documented build)
+    raise SystemExit(0)
 
 from pathlib import Path
 

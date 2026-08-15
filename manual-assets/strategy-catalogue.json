@@ -1,0 +1,517 @@
+[
+  {
+    "id": "orb",
+    "label": "Opening Range Breakout (Simple 2R)",
+    "one_liner": "The first 5 minutes of the session draw a box. Trade the first break out of that box, stop at the breakout candle's other end, target twice the risk.",
+    "session": "09:35 ET (earliest, once the range completes) → 11:00 ET cutoff",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — the opening range",
+        "p": "At 09:30 ET the market reopens with the night's news priced in, and the first few minutes are the loudest, highest-volume auction of the day. The strategy takes the highest high and lowest low of those first 5 minutes and calls that the opening range. Nothing is traded while the range is forming; the range is simply two horizontal lines the rest of the morning is measured against."
+      },
+      {
+        "h": "Entry — the first break of either side",
+        "p": "After the range closes, the engine watches the last price. The moment price trades above the range high it buys calls; the moment it trades below the range low it buys puts. It does not pick a side in advance and does not wait for a candle to close — the break itself is the trigger. Only the first break is taken; the strategy does not re-enter after being stopped."
+      },
+      {
+        "h": "Stop — the breakout candle's opposite extreme",
+        "p": "The stop goes at the far end of the very candle that caused the break: its low on a long, its high on a short. The logic is that a genuine breakout should not trade back through the bar that produced it. This is a STATIC price — it is computed once at entry and never moves."
+      },
+      {
+        "h": "Target — a flat 2R",
+        "p": "Risk (R) is the distance from entry to stop. The target sits two of those distances beyond entry. There is no scaling out and no runner: one entry, one stop, one target. A 33% hit rate breaks even; anything above that is profit."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Two failure modes dominate. First, the whipsaw open: price pokes above the range, fails, and reverses straight through the low — one loss on each side if re-entry were allowed, which is why it isn't. Second, the too-wide range: a violent first 5 minutes makes R enormous, so the 2R target sits somewhere price will not reach before midday. The range-width gates exist for exactly that second case."
+      }
+    ],
+    "trigger": "The range is the first 5 minutes of the day. Entry is the first break out of that box; the stop is the box's other end, and the target is twice that risk."
+  },
+  {
+    "id": "orb_rvol",
+    "label": "Opening Range Breakout (5m RVOL, Legacy)",
+    "one_liner": "Rank the whole watchlist by how heavy its first five minutes were, keep the eight busiest, and trade the first 5-minute bar that CLOSES outside the opening range — then hold the runner, because the target is set where it will never be reached.",
+    "session": "09:35 ET (the first 5-minute bar after the range) → 11:00 ET cutoff, 90 minutes after the open",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — one candle is the whole range",
+        "p": "This engine works on 5-minute bars and its opening range is five minutes long, which means the range is a single bar: the 09:30–09:35 candle. Its high and its low are the only two levels the strategy cares about. There is no averaging, no second confirmation bar, and no separate range-building period — by 09:35 the setup is fully defined and the state machine starts looking for a trigger on the very next bar."
+      },
+      {
+        "h": "Entry — the bar has to close beyond the level",
+        "p": "This was not a theoretical preference — it was added on 2026-08-03 after a USO short entered on a 0.13 wick below the range low that closed 0.27 back inside and lost. Both sides are live: unlike the original research spec, which used the opening candle's colour to pick one tradable side per day, this engine ships with direction set to 'either', so it scans long first and then short, and the doji skip never applies."
+      },
+      {
+        "h": "Stop — the other side of the range",
+        "p": "The stop is the opposite edge of the opening range, padded by 0.05% so a one-tick brush of the level does not close the trade: the range low times 0.9995 on a long, the range high times 1.0005 on a short. That is a STATIC price fixed at entry."
+      },
+      {
+        "h": "Target — a number chosen so it is never hit",
+        "p": "The target multiple is 10R. On a typical opening range that puts it more than ten percent away on the underlying, which is not a forecast — it is a way of saying 'no target'. The engine's own signal text spells this out, printing 'exit: 10R target' where every other strategy prints a real level. The stated thesis is that the runner is the edge: you accept many small stop-outs at the range edge in exchange for the occasional day that trends from 09:40 to the close. What actually closes these trades in live trading is therefore the premium take-profit, the 15-minute structure trail, or the end-of-day flat — not the target."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The obvious one is the range that is simply too wide. A violent opening bar puts the stop the full width of that bar away, and because the stop is a percentage of the underlying converted to a premium stop, the trade can be risking a fifth of the position on noise. There is no range-width filter in this engine — only a floor saying the range must be at least 0.1% of price, which rejects nothing on a real open. The second is the top-eight ranking itself: RVOL is measured on the opening bar only, so a symbol that gapped on news and then went completely dead still ranks top of the list all morning. The third is the 10R target's arithmetic tail — a strategy whose winners come from a handful of trend days has a long, expensive stretch of stop-outs between them, and the engine offers no scale-out to soften that."
+      }
+    ],
+    "trigger": "Same shape, but only on the busiest names of the morning, and only on a 5-minute bar that CLOSES outside the range rather than just touching it."
+  },
+  {
+    "id": "orb_v2",
+    "label": "ORB v2 (Break-Confirm-Retest)",
+    "one_liner": "The opening range is treated as a level, not a direction. Two whole candles have to close clear of it, then price has to come back, touch it and get rejected, and only then does a break of that rejection candle put you in — riding a 13-period EMA until a candle closes through it.",
+    "session": "09:45 ET (earliest — the 15-minute range must complete) → 15:30 ET last entry → 15:55 ET blanket scalp flat",
+    "horizon": "scalp",
+    "instrument": "shares",
+    "how_it_works": [
+      {
+        "h": "Setup — the opening range is a level, not a bias",
+        "p": "The first fifteen minutes of the session — three 5-minute bars by default — produce a high and a low, and those two prices are all this strategy takes from the open. It deliberately does not read the opening candle's body or colour to pick a side, which is the single thing Andre changed when he redesigned the engine on 2026-07-31: the old behaviour let one indecisive first candle commit the day to a direction. Here both sides stay armed, and the market chooses by what it does to the level. The high and the low are full wick extremes, so a spike that nobody traded at still counts as part of the range."
+      },
+      {
+        "h": "Confirmation — two candles entirely clear of the level",
+        "p": "A break is not the trigger. The engine replays every completed post-range bar of the day and counts consecutive candles that sit ENTIRELY on the far side of the level — the low of a bull candle above the range high, wick included, not merely its close. Two of those in a row arm that side. The counter resets to zero the moment one candle fails the test, so a single stretch of two clean bars is required rather than two clean bars scattered across the morning. The point of insisting on wicks is that a candle whose lower shadow is still inside the range is a candle where sellers were still active at the level, and the whole thesis is that they are not."
+      },
+      {
+        "h": "Entry — continuation through the rejection candle",
+        "p": "The trade is taken when price takes out the rejection candle's extreme in the direction of the break: its high for a long, its low for a short. The live batch quote is what tests that, so the fill is not pinned to a bar close. Two things can still refuse it. If the completed bars show the trigger was taken out on some earlier bar rather than the most recent one, the move was missed and the engine will not chase it — that side simply dies. And if the live quote is already more than half an opening-range height past the trigger, the entry is declined as late discovery, because the stop does not move to accommodate a worse fill and the risk would quietly inflate."
+      },
+      {
+        "h": "Stop — a quarter of the range inside the level (STATIC)",
+        "p": "The stop sits a quarter of the opening range's height back INSIDE the level: range high minus 0.25 × range height for a long. It is computed once at signal time, written onto the position, and never moved. It is checked intrabar against the live share price on every monitor tick, so it is a real stop rather than a close-based one. This is deliberately tight — the original backtest note records that swapping it for the opposite side of the range collapsed the result from +0.068R per trade to +0.019R, so the tight stop is load-bearing rather than incidental. It also means the number of trades that die on noise is high by design, and the strategy pays for that with the open-ended exit below."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The stop sits inside the range, so any retest that overshoots slightly deeper than the rejection candle takes it out — and this pattern's whole premise is that price comes back to the level, so it is being deliberately invited into the zone where the stop lives. That shows up in the recorded numbers as a 40% win rate. The edge is small and entirely dependent on the EMA-follow producing a few large winners; the same note records a median trade of 0.69% of price, which means commissions and spread eat the result on anything but liquid names. Finally, the whole day's arming state is recomputed from scratch on every scan rather than persisted, so it is honest about restarts but also means the engine needs the 09:30 bar to exist — if the opening bar is missing from the feed, it refuses to form a range at all and the symbol is skipped for the day."
+      }
+    ],
+    "trigger": "The break alone is not enough: price has to come back, touch the range again, get rejected, and only then does a break of that rejection candle put the trade on."
+  },
+  {
+    "id": "pa_scalp",
+    "label": "Andre's Ladder",
+    "one_liner": "Find a clean impulse leg on 5-minute structure, then buy it back almost the whole way down — a 95% retracement — with a stop just beyond the leg's origin, and manage the exit up a ladder that moves to break-even at the halfway mark and locks in at three-quarters.",
+    "session": "09:30 → 16:00 ET; 15:55 ET blanket scalp flat",
+    "horizon": "scalp",
+    "instrument": "shares",
+    "how_it_works": [
+      {
+        "h": "Setup — a higher low, then an impulse, then a deep retrace",
+        "p": "The engine looks for the freshest pivot high on 5-minute structure that is preceded by a higher low. The pivot high is the EXTREME; the higher low before it is the ANCHOR; the distance between them is the LEG, and every level in the trade is a fraction of that one measurement. The 'higher' part matters — the low before the impulse has to sit above the low before that, which is what makes the structure a sequence rather than a single bounce. Pivots are read on candle BODIES rather than wicks by default, on the reasoning that the solid part of a candle is where price was accepted and the shadows are auction noise. Shorts are the exact mirror: a pivot low preceded by a lower high."
+      },
+      {
+        "h": "Entry — 95% of the leg given back",
+        "p": "The trade is not taken on the impulse. It is taken when price comes back and gives up almost all of it — the shipped default is 98% of the leg, the live setting is 95%, which puts the entry within a few cents of the anchor. That is a deliberately extreme retracement, and it is what makes the risk so small: you are buying a few cents above the level that invalidates the whole idea. It also makes the strategy counter-trend by construction. The trigger is the live batch quote, not a bar close — a 98% retrace is a touch-and-go that a stale close misses."
+      },
+      {
+        "h": "Two stops, and they are different animals",
+        "p": "The LADDER stop sits at the 105%-of-leg level — 5% of the leg beyond the anchor — and it is CLOSE-based: a wick through it holds, only a completed 5-minute close beyond it exits. That is the validated behaviour and it is what lets the trade survive the spike that usually accompanies a genuine reversal. The HARD stop is different: it is an intrabar level at twice the entry-to-ladder-stop distance, checked against the live share price on every monitor tick, and it never moves. It exists because the study measured single fills reaching −62R when only a close-based stop was in play; adding the intrabar −2R stop cut maximum drawdown from about $26,900 to $10,400 while ADDING profit. The hard stop is also the denominator of the position size, so the dollar loss it represents is fixed per trade by design."
+      },
+      {
+        "h": "The ladder — break-even, then a ratchet (DYNAMIC)",
+        "p": "Once in, the trade climbs a three-rung ladder measured against the same leg. Reclaim half the leg and the stop moves up to break-even. Reclaim three-quarters and it ratchets again to sit at the halfway level, which locks in a real gain. Full reclaim of the extreme is the take profit. The rungs ADVANCE on an intrabar touch — the monitor polls several times a bar, and only bars that overlap or follow the entry may count — while the stop itself still only fires on a completed close beyond whichever rung is current. So the ladder tightens quickly and releases slowly, which is why it is drawn as a stepped line rather than a flat level. It ratchets in one direction only; a stage never regresses, and if the bot restarts the stage re-derives from the bottom rung, which can only ever make the stop looser."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The entry sits a few cents above the price that invalidates it, so the strategy's whole character is a high hit rate punctuated by a stop that is trivially easy to reach. On the raw study the 5-minute ladder produced very large gross profit alongside a $26,900 drawdown and a single −62R fill; the hard stop is what makes the shape survivable, not what makes it profitable. Because it is counter-trend by construction it fights every trend filter in the system, and it currently runs WITH the AI-confirm veto and the sector-rotation filter in the loop — both of which the 2026-07-30 studies measured as cutting ladder profit by 40–45%, and neither of which was present in any validation run. The take profit is a full reclaim of the extreme, which is a long way from a 95% retrace entry, so the trade needs the leg to repeat itself almost exactly. And the stage state that drives the ladder lives only in memory on the position object, so a restart mid-trade silently gives back a break-even or a locked-in ratchet."
+      }
+    ],
+    "trigger": "A clean impulse leg, then a retrace of almost the whole move -- about 95% -- and the buy-back, with the stop just beyond where the leg began."
+  },
+  {
+    "id": "ema_vwap",
+    "label": "EMA/VWAP Cross 3min",
+    "one_liner": "Let the 9EMA and session VWAP agree on a direction, wait for price to dip back and tag VWAP, and enter on the first 3-minute candle that closes back through the 9EMA — then hold until a candle closes back through it the other way.",
+    "session": "09:30 → 16:00 ET; 15:55 ET blanket scalp flat",
+    "horizon": "scalp",
+    "instrument": "both",
+    "how_it_works": [
+      {
+        "h": "Regime — the standing relationship, not one candle",
+        "p": "Before anything else the engine asks a single question: is the 9-period EMA of 3-minute closes standing above session VWAP, or below it? Above by more than a tolerance band means longs only; below by more than the band means shorts only; anything in between is neutral and nothing trades in either direction. This is a hard gate — a long can never fire while the EMA is under VWAP. It reads that way because of a real bug Andre chart-annotated on 2026-08-04: the old test was one completed candle's CLOSE against both lines, and a bar closing above VWAP is automatically also above the EMA whenever the EMA sits below VWAP, so a single spike could flip the read bullish for one tick while the actual standing trend never left the bearish side. The fix was to ask about the two lines, not about a candle."
+      },
+      {
+        "h": "Setup — the sweep arms, it does not enter",
+        "p": "Inside a live regime the engine watches for price to come back and tag VWAP: the live quote within a tolerance of VWAP while the last completed candle's close was still on the trend side. That is the wick through fair value the original spec was about — buying the dip into VWAP inside an uptrend. It used to be the entry. It is now only an arm, recorded per symbol with the bar index it happened on, so confirmation can only ever be judged on a candle strictly after the sweep was seen. Any change of regime — including a drift into neutral — wipes the arm."
+      },
+      {
+        "h": "Entry — the reclaim of the 9EMA",
+        "p": "The trade fires on the FIRST completed 3-minute candle after the arm whose close is back on the trend side of the 9EMA. That is the extra confirmation Andre asked for on 2026-08-04: a sweep alone proves price visited fair value, a reclaim proves it was rejected there. If no candle reclaims within the arm window the setup expires unfired rather than lingering. One further gate is applied last, after regime, setup and entry have all confirmed: price must be outside the opening range. Inside the range the entry is refused but the arm is deliberately NOT reset, so the same setup can still fire later once price leaves the chop zone."
+      },
+      {
+        "h": "Exit — the 9EMA the other way (DYNAMIC)",
+        "p": "There is no take-profit. The position is held until the first completed 3-minute candle CLOSES through the 9EMA against the trade. A wick through the EMA is a sweep and holds; a close through it is a break and exits. Because the EMA moves with price, the effective exit level rises through a winning long and falls through a winning short — this is a genuinely dynamic line and the reason the schematic draws it as a curve rather than a flat level. Candles that completed before the fill can never trigger it, which is what stops the setup's own price action closing the trade it just opened. When the data is too thin to judge, the exit check returns nothing and the position is held — a missing read is never treated as an exit."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The reclaim confirmation costs you the best fills: by the time a candle has closed back through the 9EMA, price is usually well off the sweep low, so the entry is worse than the sweep and the fixed-percentage stop is measured from that worse price. In a genuinely choppy session the pattern repeats endlessly — sweep, reclaim, close back through — and the engine will take each one, because nothing limits entries per symbol per day. The neutral band is the main defence against that and it is also the main source of missed trades. And the strategy's whole geometry assumes VWAP is a real level; on a name whose volume profile is lumpy, or early in the session when few prints have accumulated, VWAP moves enough that a sweep is an artefact of the calculation rather than an event in the market."
+      }
+    ],
+    "trigger": "The line is the 9EMA with session VWAP agreeing. Entry is the first 3-minute candle that closes back through the 9EMA; the trade is held until one closes back through it the other way."
+  },
+  {
+    "id": "smc",
+    "label": "SMC (Sweep -> MSS -> FVG Retrace)",
+    "one_liner": "A pool of resting stops gets wicked and rejected, structure then breaks the other way with a gap in the impulse, and you buy the pullback into that gap. Stop at the wick, target the next pool.",
+    "session": "Regular hours only, 5-minute bars. Nothing can fire before roughly 10:10 ET, no fresh entries after 15:30 ET, and anything still open is swept flat at 15:55 ET — this book never holds overnight.",
+    "horizon": "scalp",
+    "instrument": "shares",
+    "how_it_works": [
+      {
+        "h": "Beat one — the pools, and the sweep",
+        "p": "Before it can look for anything the engine draws its pools: the prior regular-hours high and low, plus every confirmed swing high and swing low from yesterday and today, where 'confirmed' means the pivot has six bars on each side that did not exceed it. A sweep is one completed 5-minute bar whose high pushes through a high pool while its close comes back below it, or whose low pushes through a low pool while its close comes back above. The wick is the sweep and the close is the verdict. From that moment on, any completed close beyond the pool kills the setup outright — that is a real breakout, not a stop hunt, and the engine wants no part of it."
+      },
+      {
+        "h": "Beat two — the market-structure shift, certified by a gap",
+        "p": "A wick proves stops were taken. It does not prove anyone changed their mind. So within the next twelve bars the engine demands a completed close through the most recent confirmed internal swing on the opposite side — internal swings use a much tighter two-bar pivot than the pools do, so this is a fine-grained structural level, not another major one. That close is the market-structure shift. On top of it, the run from the sweep bar to the shift bar must contain a fair value gap: three consecutive bars where the first bar's high sits below the third bar's low, leaving a price band nobody traded. That untraded band is the evidence that the move was displacement rather than drift. No gap, no trade."
+      },
+      {
+        "h": "Beat three — the retrace into the gap is the entry",
+        "p": "The engine does not buy the structure break. Backtesting entry-at-the-shift was negative in all twelve parameter cells tried, which is why the third beat exists. Instead it waits up to twenty-four bars for price to come back into the fair value gap and triggers the moment the live quote reaches the near edge of that gap — the top edge on a long, the bottom edge on a short. Filling deeper inside the gap is simply a better price. One further filter applies: the gap must sit in the discount half of the range carved out between the sweep and the shift for a long, the premium half for a short. Buying the top of your own impulse is not the trade; buying the part of it the market has marked down is."
+      },
+      {
+        "h": "Stop and target",
+        "p": "The stop is the sweep wick itself — the exact extreme of the bar that hunted the pool. It is a fixed price, set once at entry and never moved, and it is enforced two ways: against the live quote on every monitor tick as the position's hard level, and again as a completed close through it. The target is the nearest liquidity pool on the other side that sits at least one R away. If no such pool exists the trade is simply not taken — there is nothing drawing price in your direction, so there is no reason to expect it to travel. That rule means the reward side is market structure rather than a fixed multiple, and R multiples on real signals vary widely."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Three ways, and they are all visible in the numbers. First, the chain is long — pool, sweep, shift, gap, retrace, all inside fixed bar windows — so most days most symbols produce nothing, and the one-trade-per-symbol-per-day lock means a good setup later in the day is lost if a mediocre one fired at 10:30. Second, the honest edge is thin and tail-driven: the shipped backtest is 45.2% wins at +0.170R per trade over 312 trades, with the top ten winners carrying most of the sum, so a month can easily look flat or negative without anything being wrong. Third, the in-memory bracket. The target is gone until re-entry."
+      }
+    ],
+    "trigger": "A pool of resting stops gets swept, structure breaks the other way leaving a gap, and the trade buys the pullback into that gap. Stop at the wick, target the next pool."
+  },
+  {
+    "id": "smc_15",
+    "label": "SMC 15m (Sweep -> MSS -> FVG Retrace)",
+    "one_liner": "Exactly the same sweep → structure-shift → gap-retrace trade as the 5-minute SMC strategy, run on 15-minute bars. Far fewer signals, each about three times larger, and a hold measured in hours rather than minutes.",
+    "session": "Regular hours only, on 15-minute bars. The earliest possible signal is about 11:30 ET; the scan stops at 15:30 ET and anything open is flat by the 15:55 ET sweep, which leaves roughly a four-hour window in which this strategy can act at all.",
+    "horizon": "scalp",
+    "instrument": "shares",
+    "how_it_works": [
+      {
+        "h": "Be clear about what this is",
+        "p": "The setup, the trigger, the stop rule, the target rule and the kill conditions are byte-for-byte the ones documented on the the 5-minute SMC strategy card. What this card is for is the part that genuinely differs — what changes when the same rules are applied to bars three times the size, and why Andre would run this instead of, or alongside, the 5-minute book."
+      },
+      {
+        "h": "The windows scale with the bars, and they scale hard",
+        "p": "Reusing the 5-minute numbers on 15-minute bars would have meant a three-hour sweep window and a six-hour entry window, which is longer than the session. So a second defaults dict, DEF15, replaces four of them whenever the 15-minute timeframe is in force: the pool pivot half-width drops from six bars to two, the internal pivot from two to one, the sweep-to-shift window from twelve bars to six and the shift-to-entry window from twenty-four to twelve. In wall-clock terms that is a ninety-minute window to break structure and three hours to retrace — wider than the 5-minute book in time, tighter in bars. Note also that a two-bar pool pivot on 15-minute bars is a coarser object than a six-bar pivot on 5-minute bars, so the pools themselves are different levels, not the same levels seen through a longer lens."
+      },
+      {
+        "h": "What the bigger bars do to the trade",
+        "p": "Everything about the trade's geometry inflates together. The fair value gaps are wider bands, so the retrace entry is a looser touch. And the hold stretches: a trade that resolves in half an hour on 5-minute bars can occupy most of an afternoon here. The measured version of all that is n=75 over the same 90-symbol three-month window against n=312 for the 5-minute book — roughly a fifth of the trades — at +0.40 to +0.50R each against +0.170R."
+      },
+      {
+        "h": "Why run both",
+        "p": "Because they rarely fire on the same thing. Only about twelve percent of symbol-days overlap between the two books, which is what makes running them concurrently a diversification rather than a doubling-down; that overlap figure is the reason the two were split into separate roster strategies in the first place. The 15-minute book also measured a much better profit-to-drawdown shape — 7.4× against 2.2× — but on seventy-five trades, which is not many. Treat the per-trade numbers as a small sample and let paper data accumulate before sizing on them."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The late start is the first problem and it is structural. Needing eight completed 15-minute bars means the engine is blind until about 11:30, and the sweep-to-shift-to-retrace chain then needs several more bars, so in practice this book is an afternoon strategy with a 15:30 cutoff bearing down on it. Setups that would have completed at 15:45 simply expire. The third is sample size — seventy-five trades is enough to be encouraging and nowhere near enough to be confident, and the four retuned window values were chosen on that same small sample."
+      }
+    ],
+    "trigger": "Exactly the same sweep, break and retrace, measured on 15-minute bars instead of 5 -- far fewer signals, each about three times larger, held for hours."
+  },
+  {
+    "id": "smc_swing",
+    "label": "SMC Swing 1H (Sweep -> MSS -> FVG, multi-day)",
+    "one_liner": "The same sweep → structure-shift → gap-retrace idea as the 5-minute SMC strategy, but on 1-hour bars with pools three weeks deep and a hold measured in days. The only overnight strategy in the SMC family.",
+    "session": "Scans during regular hours only — no entry before 09:35 or after 15:45 ET — but the position is a swing and is held overnight. A trade is expected to live about five trading days.",
+    "horizon": "swing",
+    "instrument": "shares",
+    "how_it_works": [
+      {
+        "h": "The same three beats, at a completely different scale",
+        "p": "Structurally this is the exact-ICT chain: a liquidity pool is wicked and rejected, structure then breaks the other way with a fair value gap in the impulse, and the entry is the retrace back into that gap. What makes it a different strategy rather than a different setting is the scale of every object in it. The pools are 1-hour swing pivots that stay live for a hundred bars — about three weeks of trading — rather than today's and yesterday's 5-minute pivots. The sweep is a full hour of trading that pushed through a level and closed back inside it. The structure shift has eight hours to arrive, the retrace sixteen. And the trade then sits through nights, weekends and whatever the tape does at the next open."
+      },
+      {
+        "h": "What holding overnight actually does to the risk",
+        "p": "This is the part that separates this card from the other three, and it deserves to be plain. A stop is a price, and between 16:00 and 09:30 there is no price you can trade at. The stop sits at the sweep wick and is enforced against the live quote, so if a symbol gaps through it overnight the position exits on the first tick of the next session — at whatever that tick is, not at the stop. Your loss on a gap day is not one R; it is however far the gap went. The two-year study modelled exactly this, filling gaps at the open rather than at the stop, so the published +0.296R per trade already carries that cost; what it cannot carry is the tail — an earnings print, a guidance cut, a sector shock. This engine has no earnings filter of its own. The second overnight cost is opportunity: capital is committed for days at a time, and the calendar timeout will close a trade that has gone nowhere whether or not the thesis has actually been disproved."
+      },
+      {
+        "h": "Stop, target and the clock",
+        "p": "Three exits, in the order they are checked. First the calendar timeout: once the position is its hold limit old it is closed regardless of price — that is roughly five trading days at the default of seven calendar days. Then the target, the nearest opposite 1-hour pool at least a minimum reward-to-risk away, taken on a completed-bar touch. Then the stop, at the sweep wick, enforced both as an intrabar level against the live quote and as a completed 1-hour close through it. The stop is static: it is set at entry and it never moves, in either direction. There is no trailing stop, no breakeven ratchet that can realistically arm, and no partial scale-out."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Four honest problems. The overnight gap is the obvious one and is discussed above. The second is parameter fragility: the shipped k3/1 with 8/16 windows was the best in-sample cell of a grid, a neighbouring cell was also strong, and a nearby one was weak — the surface is not flat, so the in-sample choice is doing real work. The third is regime: every full half-year of the two-year study was positive and the single losing stretch is July 2026, which is the regime we are currently in, so a soft start should be expected rather than treated as evidence of a break. The fourth is quieter — the pool history is bounded by the shared structure feed, which reaches back about fifteen calendar days, or roughly seventy-five 1-hour bars. The hundred-bar pool age cap is therefore never the binding constraint live, and the live map is shallower than the backtest's was."
+      }
+    ],
+    "trigger": "The same idea again on 1-hour bars, with pools weeks deep and a hold measured in days. The only setup here that stays on overnight."
+  },
+  {
+    "id": "liq_flow",
+    "label": "Liquidity Flow (sweep vs acceptance)",
+    "one_liner": "Map every liquidity level on the chart, score them, and wait for price to interact with a good one. If liquidity was TAKEN and price reversed, fade it; if liquidity was CONSUMED and price kept going, follow it. Target the next zone on the map.",
+    "session": "Regular-hours 5-minute bars, entries only between 09:45 and 15:30 ET. Anything still open is closed by the 15:55 ET end-of-day sweep.",
+    "horizon": "scalp",
+    "instrument": "shares",
+    "how_it_works": [
+      {
+        "h": "The question this engine is built around",
+        "p": "Every other level-based strategy in the roster asks where the levels are. This one asks a different question, and the whole design falls out of it: was the liquidity at that level taken so price could reverse, or consumed so price could continue? Those two things look almost identical for the first minute and mean opposite things. A sweep is a shallow poke that closes back inside — somebody filled against the stops and let price go. Acceptance is a drive through that keeps closing beyond — the level genuinely broke and the market is trading above it now. Sweep says fade; acceptance says follow."
+      },
+      {
+        "h": "Step three — which zones are worth entering on",
+        "p": "Here the engine does something none of the other strategies do: it distrusts its own weights. That table found the hand-set weights close to inverted: the best-performing type, the low-volume node, carried the lowest base weight, while equal highs and lows carried one of the highest and measured near zero. So entries are gated on the measured table rather than the weights. A type with a positive measured edge is a 'fade' type, a negative one is a 'follow' type, anything in between or under-sampled is not enterable. Nothing is deleted — every zone still counts for confluence and still qualifies as a target. What is blocked is entering on it. If the table file is missing the gate fails closed and nothing trades."
+      },
+      {
+        "h": "Step four — classify the interaction",
+        "p": "Shallow poke, closed back inside within a few bars, still inside now: that is a sweep, and the trade is the fade. Deep drive, two or more closes beyond, none back inside: that is acceptance, and the trade is the continuation. A close-location delta proxy runs alongside as a tiebreaker and flags the 'trapped' case, where flow pushed in the pierce direction and produced no progress. Be clear about what that proxy is: it is close position within the bar's range weighted by volume, and it cannot tell a buyer lifting the offer from a seller hitting the bid. It is not order flow, and the module says so at the top."
+      },
+      {
+        "h": "Stop, target and the travel budget",
+        "p": "On a sweep the stop goes a tenth of an ATR beyond the sweep extreme; on an acceptance it goes a quarter of an ATR back inside the level that broke. Either way it is a fixed price set at entry. Any setup whose risk exceeds two percent of the share price is discarded outright. That combination has a consequence worth internalising: a crowded map above your entry can kill an otherwise perfect setup, because the nearest zone is too close to clear 1.5R. One more subtlety on the confirmed path: because entry now happens up to twelve bars after the interaction, the ordinary distance gate would reject everything — measured, distance at the shift bar runs from 1.6 to nearly 7 ATR against a 1.5 gate, and the branch fired exactly zero times."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Start with the honest scope: the only historical market data this repo has is OHLCV bars. There is no stored tape, no Level II depth and no options-chain history, so true delta, absorption, iceberg detection, replenishment, gamma walls and dealer positioning are all absent — the spec this engine implements describes them and the code implements the structural core without them. What is left leans on a delta proxy that is a weak stand-in. Then there is the narrowness of the shipped configuration. Both are on the sell side of the map, which means that as configured today this engine can only produce LONGS. Both also carry base weights below the forty-point score gate, so they only become tradable when confluence lifts them over it. That is a very small target, and it is the most likely reason this engine can scan all day and report nothing."
+      }
+    ],
+    "trigger": "Every liquidity level is scored first. If liquidity was TAKEN and price reversed, fade it; if it was CONSUMED and price kept going, follow it."
+  },
+  {
+    "id": "vwap_trend_pullback",
+    "label": "VWAP Trend Pullback",
+    "one_liner": "Price has spent most of the last two hours on one side of session VWAP. Wait for it to rotate back to VWAP, then buy the resumption when it takes out the high it made on the way back up.",
+    "session": "Regular hours only, 09:30–16:00 ET. Nothing before roughly 11:30 ET. No cutoff of its own — it will keep signalling into the close.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — a trend measured against VWAP, not against a moving average",
+        "p": "Session VWAP is the volume-weighted average price everyone who traded today actually paid. When price holds above it hour after hour, buyers are systematically paying up and the average participant is offside short."
+      },
+      {
+        "h": "Setup — the pullback has to actually reach VWAP",
+        "p": "That swing low only counts if the bar that made it closed at or below VWAP times 1.001 — in other words the dip has to have come all the way back to the average price, not merely paused a few cents off the highs. That single test is what makes this a pullback strategy rather than a breakout one: you are buying the trend where it is cheap relative to the day's own mean, and the stop sits at a structure low rather than at an arbitrary distance."
+      },
+      {
+        "h": "Entry — the resumption takes out the recovery high",
+        "p": "Once the pullback low is confirmed the engine watches the highest high made from that swing-low bar forward. The trigger is the current price trading above that running high: the dip is over, the sellers who pressed into VWAP have been absorbed, and the trend leg is starting again. The mirror image applies to a downtrend, where the pullback is a rally into VWAP and the trigger is a break of the lowest low made since the swing high. There is no candle close requirement and no re-entry logic; the engine simply re-evaluates on every scan and stops finding the setup once price has moved on."
+      },
+      {
+        "h": "Stop and targets — one static level and two branches",
+        "p": "The stop is the pullback swing extreme itself: the swing low on a long, the swing high on a short. It is computed once, at signal time, and never moves — no trailing, no ratchet, no break-even step. Risk (R) is the distance from entry to that level. The target has two branches. Only when the prior extreme has already been exceeded does the engine fall back to a flat entry ± 2R."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Three ways, and the first is severe. The literal trigger compares the current price against the maximum high of a window that includes the bar being evaluated, so whenever the price handed in is a bar close — which is every bar of every backtest replay, and every live scan where the batch quote came back empty — the comparison is arithmetically impossible and the engine returns nothing. Second, even when it does fire, the trend test is a count of closes and says nothing about slope: a symbol that ground sideways two cents above VWAP for two hours reads as a 100% uptrend, and the ADX and VWAP-slope gates exist precisely to catch that case but are off by default. Third, buying a pullback into VWAP is the same trade as fading a trend change until it isn't; on the day the trend genuinely ends, the pullback that looks best is the one that keeps going, and the stop at the swing low is exactly where everyone else's is."
+      }
+    ],
+    "trigger": "The line is session VWAP. Price has spent hours on one side of it; the trade waits for a rotation back to it and buys the resumption."
+  },
+  {
+    "id": "vwap_mean_reversion",
+    "label": "VWAP Mean Reversion",
+    "one_liner": "Price has stretched a long way from session VWAP and has stopped going. Fade it — short the failure back toward VWAP with the stop beyond the excursion extreme and VWAP itself as the target.",
+    "session": "Regular hours only, 09:30–16:00 ET. The earliest possible signal is about 10:10 ET. It defines no cutoff of its own.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — a rubber band, measured in percent",
+        "p": "Session VWAP is where the average share traded today changed hands, and intraday price tends to orbit it. Everything about the setup — how extended it is, where the stop goes, what the trigger level is — comes out of that one short window, which is both what makes the engine simple and what makes it self-referential."
+      },
+      {
+        "h": "Entry — the excursion has to fail, not just pause",
+        "p": "Being far from VWAP is not a reason to trade; being far from VWAP and turning is. On a short the engine waits for price to trade back below the reaction low of that lookback window while still being above VWAP, which is the point where the last buyers who chased the high are underwater and the move has visibly broken. On a long it is the mirror: price reclaims the reaction high of the window while still below VWAP. The 'still on the same side of VWAP' condition matters — once price has already crossed back, the reversion the strategy exists to capture has happened without you and the trade is refused."
+      },
+      {
+        "h": "Stop and target — a fixed level and a snapshot of VWAP",
+        "p": "The stop is the excursion extreme: the highest high of the lookback window on a short, the lowest low on a long. It is a single static price fixed at signal time — no trail, no break-even ratchet, no time-based tightening. The target is session VWAP itself, snapshotted at the moment of the signal, which makes it static too even though VWAP keeps moving afterwards. Be honest with yourself about the resulting geometry: because the stop is the far side of the same window whose near side you entered through, the risk is at least the whole width of that window, while the reward is only whatever is left between entry and VWAP. Reward below one R is the normal case here, not the exception, which means this strategy has to win often to be worth running."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "First and most seriously, the literal trigger cannot fire from a bar close. Second, mean reversion is the strategy that works every day until the day it doesn't: on a genuine trend day the extension keeps extending, and because the stop sits at the excursion extreme it is exactly where a trending market goes next. The ADX, slope and realized-volatility gates are the intended defence and they are off by default. Third, even a correct fade can pay badly, because VWAP is rising into a short and falling into a long — the target moves toward you, but so does the reason the trade existed, and a snapshotted target taken at signal time can be stale by the time price gets there."
+      }
+    ],
+    "trigger": "Price has stretched a long way from VWAP and stopped going. The trade fades it back toward the average, with the stop beyond the extreme."
+  },
+  {
+    "id": "liquidity_sweep_reclaim",
+    "label": "Liquidity Sweep and Reclaim",
+    "one_liner": "A level that has held for a while gets poked through, the poke fails, and price closes back on the original side. Trade the reclaim, stop beyond the failed poke, target the next level on the other side.",
+    "session": "Regular hours only, on 5-minute bars. The earliest possible signal is roughly 10:40 ET. It has no entry cutoff of its own — it will keep scanning to the close.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — a level worth hunting",
+        "p": "Stops cluster under obvious lows and over obvious highs. The more times a level has been respected, the more resting orders sit just beyond it, and the more attractive it becomes for someone to push price through it and take that liquidity. This engine builds its shortlist of such levels from two places: the confirmed swing pivots of today's 5-minute bars, and yesterday's regular-hours high and low. It keeps the three most recent swing lows plus the prior-day low as candidate supports, and the three most recent swing highs plus the prior-day high as candidate resistances. The swing pivots are deliberately computed from bars that end before the sweep window, so the level being swept is never the sweep itself."
+      },
+      {
+        "h": "Trigger — pierce, fail, come back",
+        "p": "Over the last few bars the engine takes the lowest low and the highest high. For a long it wants two things at once: that recent low must sit below a candidate support, and the current price must sit above it. That is the whole test — the level was traded through, and price is now back on the correct side of it. The short is the exact mirror: the recent high pushed above a candidate resistance and price has fallen back below. The current price is the live quote from the batch snapshot, not a bar close, so the reclaim is judged the moment the engine looks rather than at the end of a five-minute candle."
+      },
+      {
+        "h": "Stop — beyond the failed poke",
+        "p": "The stop is the sweep extreme itself: the lowest low of the sweep window on a long, the highest high on a short. The reasoning is direct. The whole thesis is that the move through the level was a liquidity grab that failed; if price returns to that extreme, the grab was not a failure after all and there is nothing left to be long of. This price is computed once at signal time and never moves."
+      },
+      {
+        "h": "Target — the next pool of liquidity, else 2R",
+        "p": "The target is the nearest candidate level on the opposite side of entry — the closest swing high or prior-day high above a long, the closest swing low or prior-day low below a short. The idea is that the sweep flushed one side of the book and price will now travel to the next place resting orders are stacked. Only when no such level exists ahead of entry does the engine fall back to a flat two-times-risk target. Nothing checks that the opposing level is far enough away to be worth the risk being taken."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The most common failure is that the sweep was not a sweep. Price traded below a swing low and came back — that also describes an ordinary pullback in a downtrend, and with the gate layer off there is nothing separating the two. The second failure is geometric: the target is the nearest opposing level, and the engine never checks that it is further away than the stop, so a swing high sitting a few cents above entry produces a trade risking the full sweep depth to make almost nothing. The third is chase. Entry is the live quote with no cap on how far past the reclaimed level it may be, while the stop stays pinned at the sweep extreme, so a fast reclaim inflates risk without moving the target. And the fourth is simply that a real break looks identical to a failed one until it doesn't: on trend days the level gets taken, price reclaims for one bar, and then goes right back through."
+      }
+    ],
+    "trigger": "A level that held for a while gets poked through, the poke fails, and price closes back on the original side. The stop sits beyond the failed poke."
+  },
+  {
+    "id": "compression_breakout",
+    "label": "Intraday Compression Breakout",
+    "one_liner": "When a stock stops moving, the range it stops moving in becomes a box. Trade the first break out of that box, stop at the breakout candle's other end, target one full box height.",
+    "session": "Regular hours only, on 5-minute bars. The earliest possible signal is roughly 10:35 ET. It has no entry cutoff of its own — it will keep scanning to the close.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — a box, defined by tightness rather than shape",
+        "p": "Volatility clusters. A stretch of quiet is usually followed by a stretch of movement, and the quiet stretch leaves behind an obvious set of edges that everyone can see. This engine looks at a fixed number of trailing 5-minute bars — twelve by default, an hour of tape — and takes their highest high and lowest low. If that range is narrow enough relative to its own midpoint, it is a box; if it is not, there is no setup and the symbol is dropped. That is the entire definition."
+      },
+      {
+        "h": "Entry — the first trade outside the edges",
+        "p": "The box is computed from bars ending one bar before the present, so the most recent bar is a candidate breakout candle rather than part of the box it is breaking. The engine then compares the live quote to the two edges: above the box high it buys calls, below the box low it buys puts. It does not pick a side in advance and it does not wait for a bar to close — the quote being outside the box is the trigger. In the shipped configuration there is no buffer, so a single tick past the edge counts."
+      },
+      {
+        "h": "Stop — the breakout candle's other end",
+        "p": "The stop is the low of the current bar on a long and its high on a short, provided that price is on the correct side of it; otherwise it falls back to the far edge of the box. The thesis is that a genuine expansion out of compression should not trade back through the bar that produced it. This is a static price, fixed at signal time. Be aware that the source contains a line intending to also cap the stop at the box midpoint, and that line is immediately overwritten and never takes effect — so in practice the stop can sit anywhere the breakout bar's low happens to be, including well below the box."
+      },
+      {
+        "h": "Target — one box height, with a 2R floor",
+        "p": "The classic measured move: whatever the box was tall, project that same distance from the entry. It is a modest, defensible target — you are claiming the energy stored during the quiet period is worth about one range, not a trend day. Because a tight box can easily be shorter than the distance to the stop, the engine checks: if the box-height target would not even clear one times risk, it is replaced with a flat two-times-risk target instead. So the trade is never knowingly taken at worse than 1R, and on the very tightest boxes it quietly becomes a 2R trade."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The false break is the whole risk, and it is common — a box is a magnet for stop orders sitting just beyond both edges, so poking one side and reversing is a profitable game for someone else. With the gate layer off, nothing distinguishes a one-tick graze on falling volume from a genuine expansion; the buffer and volume gates exist for precisely that, and they are off. The second problem is that the tightest boxes are the most attractive on paper and the worst in practice: the narrower the box, the more often the box-height target collapses into the 2R fallback, which is a very different trade from the one the setup advertises. Third, the box is a fixed window rather than a real structure, so on a slow grind the engine will keep declaring boxes that nobody was actually defending. And finally there is no chase cap at all: entry is the live quote however far past the edge it has already run, while the stop stays at the breakout bar's low, so arriving late silently inflates R."
+      }
+    ],
+    "trigger": "The range here is a volatility squeeze -- the stock stops moving. The stop is the far side of the box and the target is one full box height."
+  },
+  {
+    "id": "order_flow_momentum",
+    "label": "Order Flow Momentum",
+    "one_liner": "A synthesized buying-pressure line is rising, and price pushes through the higher of the last two swing highs. Buy calls there, stop under the lower of the last two swing lows, target twice the risk.",
+    "session": "09:30–16:00 ET on 5-minute bars. In practice no signal before roughly 10:05–10:10 ET. There is no entry cutoff of its own; this strategy is same-day only.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — a pressure line and a piece of structure",
+        "p": "The idea behind this strategy is the oldest one in tape reading: if buyers have been paying the offer for a while and price then clears the last shelf of supply, the people who were selling into that shelf are done and the move continues. The engine expresses that as two separate readings taken from the same 5-minute bars. The first is a cumulative volume delta line, which is meant to say whether aggressive buyers or aggressive sellers have been in control. The second is the recent swing structure — the pivot highs and pivot lows that the last half hour of trading has laid down. Neither reading is a signal on its own; the trade is the moment they agree."
+      },
+      {
+        "h": "Entry — agreement between the proxy and the structure",
+        "p": "On each scan the engine takes the change in the proxy line over the lookback window and asks only whether it is positive or negative. There is no magnitude test at all: one share of net positive delta counts the same as a million. If it is positive, the engine finds the last two confirmed pivot highs and takes the HIGHER of the two as the trigger level; if the live quote is above it, calls are bought at that quote. Negative delta plus price below the LOWER of the last two pivot lows buys puts. The trigger level is therefore genuinely historical structure, not something that just formed."
+      },
+      {
+        "h": "Stop — the FARTHER of the two recent swing lows",
+        "p": "That is deliberately the wider of the two available stops, and it matters more than it sounds: it is what sets R, and R is what sets the target. A long that triggers on a break of a swing high sitting a few cents above recent trade can still be carrying a stop half a percent below, and the 2R target is then a full percent away. The stop is STATIC — computed once at signal time and never recomputed by this engine."
+      },
+      {
+        "h": "Target — a flat 2R, and what actually closes the trade",
+        "p": "The target the engine reports is entry plus twice the entry-to-stop distance on a long, and the mirror on a short. There is no scaling out and no runner. It is worth being precise about what those two underlying prices do in live trading, though, because it is not what most people assume. The underlying stop is not armed as a price trigger. The structure-break exit is scoped to the andre and orb strategies, and the level-invalidation exit is scoped to the levels strategy, so neither reaches this engine's positions. In practice the trade closes when the contract is down 35 percent, up 70 percent, or caught by the global breakeven ratchet."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Three ways, and the first is structural. Because the proxy test is a bare sign check, in any session with a mild upward drift the CVD condition is satisfied essentially all day, and the strategy degenerates into 'buy every break of the higher recent swing high' — a plain momentum breakout wearing an order-flow label. Second, the wide stop: taking the deeper of two pivot lows makes R large on exactly the days when structure is messy, and a 2R target measured from a large R is frequently a move the underlying will not make before the close, which for a 0DTE-style contract means theta wins. Third, nothing stops the setup repeating."
+      }
+    ],
+    "trigger": "A synthesised buying-pressure line is rising and price pushes through the higher of the last two swing highs. Stop under the last two swing lows, target twice the risk."
+  },
+  {
+    "id": "late_day_momentum",
+    "label": "Late-Day Momentum Continuation",
+    "one_liner": "A stock that has spent the whole session on one side of VWAP coils into a tight box in the last hour. Buy the break of that box, stop at its far side, target the next swing — and be flat by the bell.",
+    "session": "15:00 ET → 16:00 ET only (one hour a day; nothing else fires)",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — a day that already made up its mind",
+        "p": "The engine only looks at the market between 15:00 and 16:00 ET. Before that hour it returns nothing at all, no matter how good a chart looks. Inside the hour it asks one question about the whole session so far: what fraction of the day's 5-minute closes printed above session VWAP, and what fraction below. If at least 65% sit on one side the day is called an uptrend or a downtrend; if neither side reaches 65% the symbol is dropped. That is a deliberately crude test, and it is crude on purpose — the strategy is not trying to find a turn, it is trying to identify a day that has already been one-directional and is likely to stay that way into the close as institutional order flow finishes what it started."
+      },
+      {
+        "h": "Entry — the live quote, not a bar close",
+        "p": "The trigger is a bare inequality against the live price: for a long, the current quote trading above the box high (or the day high); for a short, below the box low (or the day low). There is no close-beyond requirement, no volume confirmation and no retest. The scan pulls a batch quote for the whole universe and uses that price as the entry price, falling back to the last 5-minute close if the quote is missing. Because scans run on an interval, the fill price is whatever the quote happened to be when the engine looked — the engine does not cap how far past the level that may be."
+      },
+      {
+        "h": "Stop — static, at the other side of the structure",
+        "p": "When a box exists the stop is simply the box's other edge: the box low on a long, the box high on a short. Because a box is by definition no wider than 0.6% of price, that makes R small and the geometry tight. When there is no box the fallback is much cruder and worth knowing about: the stop becomes the LOWEST swing low of the entire session on a long (the highest swing high on a short), not the most recent one. On a strong trend day that can be a stop several percent away, and the same 2R target is then measured off that much larger R. The stop is computed once at entry and never moves — it is static."
+      },
+      {
+        "h": "Target — the next level, else two times risk",
+        "p": "The engine looks through the day's confirmed swing pivots for the nearest one beyond the entry in the trade's direction — the closest swing high above a long entry, the closest swing low below a short entry — and uses that as the target, on the reasoning that the next place the market already turned is the next place it is likely to pause. If no such pivot exists, which is common when the entry is a break of the day's own high, the target falls back to entry plus two times risk."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "The obvious failure is the late-day fake: a one-directional day squeezes into a box because the trend is exhausted, not because it is resting, and the break is the last buyer being filled before the reversal. Because there is no retest and no volume test, this strategy takes every one of those. The second failure is quieter and structural. The trade lives entirely inside the window where the bot's own end-of-day profit protection is tightening — from 15:00 a scalp that gives back 20% of its peak is closed, and that fraction shrinks toward 6% as the bell approaches — and everything left over is swept flat at 15:55. So the 2R target frequently never gets a chance to govern the exit, and the strategy's measured behaviour is closer to 'ride the last half hour and get taken out on the first give-back' than the geometry suggests. Third, theta: a 0DTE contract bought at 15:20 has forty minutes of life, so a move that goes nowhere still loses, and the flat -35% premium stop can be hit by decay alone while the underlying sits exactly where you bought it."
+      }
+    ],
+    "trigger": "A stock that spent the whole session on one side of VWAP coils in the last hour. The trade buys the break of that box and is flat by the bell."
+  },
+  {
+    "id": "gamma_level_reaction",
+    "label": "Gamma Level Reaction",
+    "one_liner": "Dealer-positioning levels — the call wall, the put wall, the gamma flip and max pain — are the strikes market makers have to hedge around. Trade price rejecting off one of them, or accepting through it, targeting the next one.",
+    "session": "09:30–16:00 ET on 5-minute bars. Roughly 09:55–10:00 ET at the earliest, and it also needs a fresh dealer-positioning snapshot, which is refreshed every 15 minutes while the market is open. No entry cutoff of its own.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup — why these four prices matter",
+        "p": "Options dealers are short the contracts retail and institutions bought, and they hedge that exposure in the underlying. Where open interest is concentrated, their hedge changes fastest, so their buying and selling near those strikes is mechanical rather than opinionated. Price tends to either stall at those strikes, because dealers are leaning against it, or to accelerate through them, because the hedge flips sign. The strategy does not try to predict which; it waits for price to interact with one of the four levels and then trades the interaction it observes."
+      },
+      {
+        "h": "Entry — nearest level, then rejection or breakout",
+        "p": "The engine picks whichever of the available levels is nearest the current price. Given that, two patterns qualify for a long. A REJECTION is price having traded below the level within the lookback window and now being back above it. A BREAKOUT is the previous completed bar having closed at or below the level with price now above it — the crossing bar itself. Shorts are the mirror. When both patterns are true the engine calls it a rejection."
+      },
+      {
+        "h": "Stop and target — geometry that comes from the levels",
+        "p": "On a rejection the stop is the lower of the reaction low and the level itself, which puts it under the wick that probed through. On a breakout the stop IS the level: the thesis is acceptance through it, so a return below kills the idea. Both are STATIC prices, fixed at signal time. The target is the next positioning level in the trade's direction — the next wall or flip or max pain above entry for a long — and only if there is no such level does it fall back to twice the risk. That is faithful to the idea, but it also means the reward is whatever the chain happens to put there, and there is no minimum reward-to-risk check anywhere in this strategy. A rejection that entered a long way above its stop with the next wall only a few cents overhead is a perfectly valid signal to this engine even though the geometry is terrible."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Start with the data. The walls are open-interest extremes on one expiry, refreshed every fifteen minutes; they are a reasonable proxy for dealer positioning and nothing more, because this codebase has no transaction-classified options flow and therefore no way to know which side actually opened the interest. Then the reward: because the target is 'the next level' with no minimum, a large number of valid signals carry sub-1R geometry."
+      }
+    ],
+    "trigger": "The level is one market makers must hedge around -- a call wall, a put wall, the gamma flip. The trade takes the rejection off it, or the acceptance through it."
+  },
+  {
+    "id": "kay_orb",
+    "label": "KayCapitals A+ ORB Continuation",
+    "one_liner": "Wait for price to escape the overnight no-trade zone, then take the FIRST clean continuation after it breaks the opening range the same way -- never on the breakout candle itself, always after a retest that holds and a confirming candle. Profit comes off at a key level, never at a fixed R multiple, because the whole premise is that levels are where the other side's orders sit.",
+    "session": "09:45 ET earliest (the 15-minute opening range must be complete) -> 11:00 ET last entry -> 15:55 ET blanket scalp flat. Nothing from this engine is ever held overnight.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "The no-trade zone -- the gate that rejects most bars",
+        "p": "Four prices are taken before the open: the premarket high and low, and yesterday's regular-hours high and low. They are not entry levels; they are the walls of a box. While price sits inside that box, both sides still have unfinished business and an opening-range break is just noise inside a bigger box, so nothing is taken at all. Price must CLOSE clear of the zone before any setup counts, and the direction of that escape is the only direction that may be traded that session. This is by a wide margin the most consequential number in the strategy: on a real two-year replay, 83% of every candidate bar was rejected right here, and every other filter only ever sees the remaining 17%. Getting the premarket levels requires an extended-hours feed, and the bot fails CLOSED without one -- a missing premarket high is recorded as unknown, never as zero, because a symbol with no premarket data would otherwise appear to escape the box every single morning."
+      },
+      {
+        "h": "The opening range, then break, retest, continuation",
+        "p": "The first fifteen minutes of regular trading give a high and a low. Nothing may be taken before that range is complete, which is why 09:45 is a structural floor rather than a preference. Then: a break is not an entry. Price has to close beyond the range edge, come BACK and touch it -- within a tolerance measured in ATR, so the touch means the same thing on a quiet day as on a violent one -- and the level has to hold. Only then, on the next confirming candle, is the trade taken. The source rules are unambiguous that the breakout candle itself is never chased, and the bot enforces that twice over: once by requiring the retest at all, and again with a hard gate that refuses any entry sitting more than 0.75 ATR past the trigger, no matter how good the setup looks."
+      },
+      {
+        "h": "The filters, and the 3-of-5 quality score",
+        "p": "A 200-period average on the 5-minute chart is the regime read, and by default it is a hard gate: a long below it, or a short above it, is refused outright. Before that, the engine asks whether price is CHOPPING on the average rather than trending away from it -- the last five closes flipping sides more than twice, or all five sitting within 0.10 ATR of it, magnetised with no room for a continuation leg. Either vetoes the setup. Session VWAP and a bull or bear flag are preferred but not required. Five components are then scored, and only after every mandatory gate has already passed: three of five is the minimum that qualifies. The ordering is the entire point -- a perfect five can never buy its way past a gate, because the score exists to RANK setups that already qualified, not to admit ones that did not. A component whose data is missing counts as unknown, not as false, so a degraded feed produces no trades rather than looser ones."
+      },
+      {
+        "h": "The stop and the target -- structure, never a percentage",
+        "p": "There is no percentage stop anywhere in this strategy. The stop is whichever of four structural prices is nearest: the far side of the flag, the retest's own invalidation swing, the key level that broke and is now support or resistance, or re-entry into the opening range. Each is padded by 0.05 ATR so a wick that only kisses the level does not take it out. If every rung is unusable the trade is refused rather than falling back to a percentage. The target is the nearest key level ahead of the entry that is at least twice the risk away, and only levels that can actually act against the trade count. If no level qualifies, the trade is REJECTED -- manufacturing a target at twice the risk would convert this into a fixed-R system wearing a level-shaped costume, and every number measured after that would describe a different strategy."
+      },
+      {
+        "h": "Managing it, and where it breaks down",
+        "p": "Half the position comes off at the first target, the stop moves to breakeven, and from there a trail follows the most recent confirmed swing behind price, taking the TIGHTER of the old and new stop so it can never widen. A position that has not made a quarter of its risk back within twenty minutes is closed at the market: this is a continuation trade, and if the continuation has not happened, waiting longer is hoping. Everything is flat by 15:55 and nothing is held overnight. Where it struggles: it is extremely sensitive to premarket data quality and fails closed, so a feed gap looks identical to a quiet market. It needs a symbol that HAS a meaningful premarket session, which is why the universe is index ETFs rather than single names. And the 200-period average needs about 2.6 sessions of history, so a cold start genuinely has no answer for the first two and a half days."
+      }
+    ],
+    "trigger": "Price must first escape the overnight zone, then break the opening range the same way. Profit comes off at a level, never at a fixed multiple."
+  }
+]
