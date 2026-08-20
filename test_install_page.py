@@ -6,16 +6,19 @@ from pathlib import Path
 PAGE = Path(__file__).with_name("index.html").read_text(encoding="utf-8")
 
 
-def test_page_offers_both_mac_architectures() -> None:
+def test_page_offers_apple_silicon_and_is_honest_about_intel() -> None:
+    # Since v0.15.0 the compiled (Nuitka) build is Apple-Silicon-only. The
+    # Intel card stays visible but is a plain explanation, not a download --
+    # a dead download link is worse than an honest "ask Andre".
     assert 'data-asset="copier-agent-macos-apple-silicon"' in PAGE
-    assert 'data-asset="copier-agent-macos-intel"' in PAGE
+    assert 'data-asset="copier-agent-macos-intel"' not in PAGE
     assert "Apple Silicon (M1 or later)" in PAGE
     assert "Intel processor" in PAGE
+    assert "Not supported by this download" in PAGE
     assert "Update temporarily unavailable" not in PAGE
     assert 'id="dl-mac-arm" href="#" aria-disabled="true"' not in PAGE
-    assert 'id="dl-mac-intel" href="#" aria-disabled="true"' not in PAGE
     assert "Download for Apple Silicon" in PAGE
-    assert "Download for Intel Mac" in PAGE
+    assert "Download for Intel Mac" not in PAGE
 
 
 def test_windows_download_uses_the_friendly_installer() -> None:
@@ -30,10 +33,11 @@ def test_page_explains_device_code_onboarding() -> None:
     assert "six setup" not in PAGE
 
 
-def test_mac_commands_choose_the_download_for_this_cpu() -> None:
+def test_mac_commands_refuse_intel_and_use_the_apple_silicon_file() -> None:
     assert 'uname -m' in PAGE
     assert 'copier-agent-macos-apple-silicon' in PAGE
-    assert 'copier-agent-macos-intel' in PAGE
+    assert 'copier-agent-macos-intel' not in PAGE
+    assert 'will not run on it' in PAGE
     assert '~/Downloads/copier-agent-macos\n' not in PAGE
 
 

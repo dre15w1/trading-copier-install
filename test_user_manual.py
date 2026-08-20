@@ -10,7 +10,10 @@ PDF = ROOT / "Trading-Copier-Setup-Guide.pdf"
 def test_manual_is_detailed_and_current():
     reader = PdfReader(PDF)
     assert len(reader.pages) >= 55
-    assert reader.metadata.title.endswith("v0.13.7")
+    # Pin the published version; update on every manual publish. (This was
+    # stale at v0.13.7 while the repo served the 0.14.8 manual - the pin
+    # only works if publishing and updating it travel together.)
+    assert "v0.15.2" in str(reader.metadata.title)
     text = "\n".join(page.extract_text() or "" for page in reader.pages)
     required = [
         "Install on Windows",
@@ -30,6 +33,8 @@ def test_manual_is_detailed_and_current():
         "Troubleshooting",
         "Glossary",
         "Authoritative investor references",
+        "Live View",
+        "Take Profit",
     ]
     for phrase in required:
         assert phrase.lower() in text.lower(), phrase
