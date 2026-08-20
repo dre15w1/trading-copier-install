@@ -495,15 +495,22 @@
         <span class="meta" id="meta-mac-arm">Loading&hellip;</span>
       </a>
 
-      <div class="dl" id="dl-mac-intel" aria-disabled="true" style="opacity:.72;cursor:default">
+      <!-- Pinned to the last Intel-compatible release (v0.14.8) rather than
+           "latest" -- the class="unavailable" marker excludes this link from
+           the auto-resolve-to-latest loop below, since 0.15.x dropped Intel.
+           Some subscribers are still on Intel Macs and need the app even
+           without Live View / newer features, so this stays a real download
+           instead of a dead end. -->
+      <a class="dl unavailable" id="dl-mac-intel"
+         href="https://github.com/dre15w1/trading-copier-install/releases/download/v0.14.8/copier-agent-macos-intel">
         <span class="os">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.5-.15-2.85.85-3.6.85s-1.9-.83-3.1-.81c-1.6.03-3.05.93-3.87 2.35-1.65 2.86-.42 7.1 1.19 9.42.79 1.14 1.73 2.42 2.96 2.37 1.19-.05 1.64-.77 3.08-.77s1.85.77 3.1.74c1.28-.02 2.09-1.16 2.87-2.3.9-1.32 1.27-2.6 1.29-2.66-.03-.01-2.48-.95-2.5-3.78zM14 5.4c.66-.8 1.1-1.9.98-3-.95.04-2.1.63-2.78 1.42-.61.7-1.14 1.83-1 2.9 1.06.08 2.14-.54 2.8-1.32z"/></svg>
           macOS &mdash; Intel
         </span>
-        <span class="muted" style="font-size:14px">Intel processor</span>
-        <span class="cta" style="background:none;border:none">Not supported by this download</span>
-        <span class="meta" id="meta-mac-intel">Intel Macs run from source &mdash; ask Andre</span>
-      </div>
+        <span class="muted" style="font-size:14px">Intel processor &middot; older build, no Live View</span>
+        <span class="cta">Download v0.14.8 (legacy)</span>
+        <span class="meta" id="meta-mac-intel">13.3&nbsp;MB &middot; v0.14.8 &mdash; last Intel-compatible build</span>
+      </a>
     </div>
     <p class="muted" style="font-size:13.5px;margin-top:14px">
       Cautious? Check your download against
@@ -635,10 +642,10 @@
 
               <div class="cmd">
                 <button class="copy" type="button" data-copy="mac-cmds">Copy</button>
-<pre id="mac-cmds">if [ "$(uname -m)" != "arm64" ]; then
-  echo "This Mac has an Intel chip - this download will not run on it. Tell Andre."; exit 1
+<pre id="mac-cmds">FILE="$HOME/Downloads/copier-agent-macos-apple-silicon"
+if [ "$(uname -m)" != "arm64" ]; then
+  FILE="$HOME/Downloads/copier-agent-macos-intel"
 fi
-FILE="$HOME/Downloads/copier-agent-macos-apple-silicon"
 chmod +x "$FILE"
 xattr -d com.apple.quarantine "$FILE"
 "$FILE"</pre>
