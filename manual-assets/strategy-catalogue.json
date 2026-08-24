@@ -31,6 +31,33 @@
     "trigger": "The range is the first 5 minutes of the day. Entry is the first break out of that box; the stop is the box's other end, and the target is twice that risk."
   },
   {
+    "id": "andre_orb",
+    "label": "Andre ORB (no TP, -20% premium stop)",
+    "one_liner": "Trades the exact same opening-range break as the plain ORB strategy -- same entry, same stop, same timing -- but nothing forces an exit at a fixed profit target. The position is left open to let a real trend run further, with only a wide loss stop and the close standing between it and the exit.",
+    "session": "09:30 ET open through a 10:30 ET cutoff on new entries; every position is closed out flat by the end of the day, never held overnight.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup and entry -- identical to the plain ORB strategy",
+        "p": "The opening range and the break that triggers a trade are drawn from the exact same rules as the plain ORB strategy: the first few minutes of the session mark a high and a low, and the first clean break of either side is bought. Nothing about how or when a trade opens is different here -- the two strategies enter at the same moment, in the same names, on the same signal."
+      },
+      {
+        "h": "Stop -- a wide, fixed loss limit",
+        "p": "The stop is not the breakout candle's opposite edge the way the plain version uses. Instead the option position is closed once it loses about a fifth of what was paid for it. That is a wider leash than a typical scalp stop, deliberately, so that ordinary give-back on a real trend does not knock the trade out before it has a chance to work."
+      },
+      {
+        "h": "No profit target -- this is the whole point",
+        "p": "There is no take-profit level anywhere in this strategy. A typical scalp locks in a double of its risk and moves on; this version does not, because the profitable trades in this family tend to keep running well past a small fixed target, and capping them early was found to give back more than it protected. The tradeoff is real: more of the small losing trades run their full loss, in exchange for the winners being allowed to pay for them."
+      },
+      {
+        "h": "Exit -- stopped out, or flattened at the close",
+        "p": "Only two things end a trade: hitting the wide loss stop, or the trading day ending. Every position still open in the afternoon is sold flat before the close -- nothing from this strategy is ever carried overnight, regardless of whether it is winning or losing at that point."
+      }
+    ],
+    "trigger": "The same range and the same break as the plain ORB strategy -- the entries are identical. There is no profit target at all, which is why none is drawn: the position is left to run. It ends in one of three ways -- the option loses about a fifth of what was paid, price closes back through its moving average twice in a row, or the clock runs out and everything is sold flat. The loss limit is a share of the premium rather than a level on the chart above, so it cannot be drawn there honestly."
+  },
+  {
     "id": "orb_rvol",
     "label": "Opening Range Breakout (5m RVOL, Legacy)",
     "one_liner": "Rank the whole watchlist by how heavy its first five minutes were, keep the eight busiest, and trade the first 5-minute bar that CLOSES outside the opening range — then hold the runner, because the target is set where it will never be reached.",
@@ -426,6 +453,37 @@
     "trigger": "A synthesised buying-pressure line is rising and price pushes through the higher of the last two swing highs. Stop under the last two swing lows, target twice the risk."
   },
   {
+    "id": "htf_level_flow_reversal",
+    "label": "1H Level + Flow Reversal",
+    "one_liner": "Trades a rejection off a strong, body-defined 1-hour demand or supply zone, but only after a second 5-minute continuation candle and repeated confirmation from real-time tape and order-book flow.",
+    "session": "Scans completed 5-minute bars during the regular session, inside the 09:30-16:00 ET scalp window like the rest of the roster. Its structural zones come from the last 30 days of completed hourly bars. A confirmed setup can stay armed for a stretch while it waits on the next 5-minute candle and fresh order flow before it is dropped as stale.",
+    "horizon": "scalp",
+    "instrument": "options",
+    "how_it_works": [
+      {
+        "h": "Setup -- a body-defined 1-hour zone",
+        "p": "The engine watches completed hourly candles for a structure shift: a rejection followed by a close above the last lower swing high builds a demand zone, and the mirror image builds a supply zone. The zone's edges are drawn from candle bodies, because a body shows where price was actually accepted, while the wick beyond it is kept separately as a liquidity sweep rather than folded into the zone itself."
+      },
+      {
+        "h": "Ranking -- a zone has to earn the right to be traded",
+        "p": "Every zone is scored out of 100 on how far price moved away from it, how many times price has reacted off it before, whether it was swept first, and how recently it formed. Weak, old or thin zones are ignored outright; live trading requires a fairly high score before a zone is even eligible for a setup."
+      },
+      {
+        "h": "Trigger -- rejection, then a second candle that agrees",
+        "p": "A completed 5-minute candle has to touch or poke through the zone and close back outside it -- that only arms the setup, it is not the entry. The very next 5-minute candle then has to close even farther away from the zone than the first one did. If it doesn't, the setup is cancelled and the zone goes on cooldown before it can arm again; a single wick by itself never triggers a trade."
+      },
+      {
+        "h": "Confirmation -- real order flow has to agree twice over",
+        "p": "Once price has confirmed with two candles, the engine checks live tape prints, order-flow imbalance and order-book depth at the zone and requires several independent supportive reads before it will actually enter. A quiet, stale, thin or opposing tape resets or blocks the trade -- there is no synthetic stand-in for real flow, so a data outage produces no trade rather than a guess."
+      },
+      {
+        "h": "Stop, target and where it breaks down",
+        "p": "The stop sits beyond the zone or its liquidity sweep, whichever is farther, with a little extra room so a shallow wick doesn't take it out; the initial target is a set multiple of that risk, with a runner managed off further readings of the same live order flow. The honest limits: the 1-hour chart only marks a location, not a guaranteed reversal, so it leans entirely on live order-flow confirmation, and if the data feed backing that confirmation is stale or unavailable the strategy simply produces nothing rather than trading blind."
+      }
+    ],
+    "trigger": "The level is a strong 1-hour zone built from candle bodies. A 5-minute rejection arms it, a second candle and live order flow must both agree, and the stop sits beyond the zone's sweep."
+  },
+  {
     "id": "late_day_momentum",
     "label": "Late-Day Momentum Continuation",
     "one_liner": "A stock that has spent the whole session on one side of VWAP coils into a tight box in the last hour. Buy the break of that box, stop at its far side, target the next swing — and be flat by the bell.",
@@ -513,5 +571,59 @@
       }
     ],
     "trigger": "Price must first escape the overnight zone, then break the opening range the same way. Profit comes off at a level, never at a fixed multiple."
+  },
+  {
+    "id": "swing_trend_pullback",
+    "label": "Swing — Trend Pullback",
+    "one_liner": "Continuation after a controlled ATR pullback inside an established daily trend, confirmed by the latest hourly move.",
+    "session": "Signals come from the nightly scan of completed daily and hourly bars, not from watching price during the day. The roster window defaults to 09:30-16:00 ET but can be narrowed, and once a position is open it can be held overnight for two to ten trading days.",
+    "horizon": "swing",
+    "instrument": "both",
+    "how_it_works": [
+      {
+        "h": "Setup -- find the trend",
+        "p": "The daily close has to sit above both a fast and a slow moving average, with the fast one still above the slow one -- for a short, the ordering flips the other way. That ordering is the whole regime read: this strategy has no view on stocks that are consolidating or in the middle of choosing a direction, only on ones already moving one way on the daily chart."
+      },
+      {
+        "h": "Entry -- a controlled pullback, then an hourly confirmation",
+        "p": "Price is allowed to pull back toward the fast moving average, but only up to one and a half times the daily ATR -- anything looser is skipped as too extended to call a controlled pullback. The trade isn't taken on the pullback itself: the most recently completed hourly candle also has to close back in the direction of the daily trend before entry is confirmed."
+      },
+      {
+        "h": "Stop, target and the clock",
+        "p": "The stop sits one and a half ATR beyond the signal close, and the initial target sits three ATR beyond it -- twice the risk. If neither has been hit, the position is closed automatically after ten trading days rather than left open indefinitely; live management can close it sooner through the same overnight swing exit process the other swing strategies use."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "A pullback can qualify even in a market-wide selloff -- there is no separate market-regime guard on top of the trend filter yet. The pullback check only asks whether price came close enough to the moving average, not whether it actually touched it, so a shallow dip can still qualify. And because this is a swing position, a stop is only a price: an overnight gap through it exits at whatever the next open prints, not at the stop itself."
+      }
+    ],
+    "trigger": "The trend and the pullback are measured on daily bars, the confirmation on the hourly. Held for days: stop 1.5 ATR away, target twice the risk, closed after ten days regardless."
+  },
+  {
+    "id": "swing_52week_breakout",
+    "label": "Swing — 52-Week High Breakout",
+    "one_liner": "Buys a 20-day price breakout that happens near the 52-week high, once daily relative volume confirms real participation.",
+    "session": "Signals come from the nightly scan of completed daily bars, not from watching price during the day. The roster window defaults to 09:30-16:00 ET but can be narrowed, and once a position is open it can be held overnight for two to ten trading days.",
+    "horizon": "swing",
+    "instrument": "both",
+    "how_it_works": [
+      {
+        "h": "Setup -- staying near the yearly high",
+        "p": "The stock's daily close has to sit within three percent of its trailing 52-week high before anything else is checked. That is a location filter, not a trigger: it narrows the universe down to names already near their best levels of the year, where a breakout is most likely to mean something rather than just be noise."
+      },
+      {
+        "h": "Trigger -- clearing the last 20 sessions on real volume",
+        "p": "The completed daily close has to equal or exceed the highest high of the prior 20 trading sessions, and daily volume has to run at least one and a half times its own 20-day average on the breakout day. A breakout on light volume is skipped outright -- the strategy wants real participation behind the move, not a low-volume drift through the level."
+      },
+      {
+        "h": "Stop, target and the clock",
+        "p": "The stop is set at the prior 20-session high minus one ATR, fixed the moment the breakout is recognized. The initial target sits three ATR above the signal close -- roughly twice the risk. If the trade hasn't resolved either way within ten trading days it is closed automatically; live management can close it sooner through the same overnight swing exit process the other swing strategies use."
+      },
+      {
+        "h": "Where it breaks down",
+        "p": "Only bullish breakouts exist today -- there is no short side to this strategy yet. A tight base is preferred but a loose, sloppy one is not actually blocked from qualifying. And because this is an overnight position, the stop is only a price: a gap through it at the next open exits at whatever that open prints, not at the stop itself."
+      }
+    ],
+    "trigger": "The range is the last 20 sessions, broken near the 52-week high on heavy volume. Stop one ATR under the broken level, target three ATR, ten-day time limit."
   }
 ]

@@ -80,7 +80,12 @@ def strategy_assets() -> None:
         draw.text((48, 34), spec["title"], font=_font(30, True), fill="#e6edf3")
         chart_left, chart_right, chart_top, chart_bottom = 55, 865, 105, 500
         bars = spec["bars"]
-        values = [v for bar in bars for v in bar] + [spec["entry"], spec["stop"], spec["target"]]
+        # A level may be None -- a strategy with no take-profit has none to
+        # plot, and one whose stop is a share of the option premium has no
+        # price level for it on a chart of the underlying.
+        levels = [v for v in (spec.get("entry"), spec.get("stop"),
+                              spec.get("target")) if v is not None]
+        values = [v for bar in bars for v in bar] + levels
         low, high = min(values), max(values)
         pad = max((high - low) * .12, 1)
         low, high = low - pad, high + pad
@@ -115,9 +120,11 @@ def strategy_assets() -> None:
             draw.rectangle((x - candle_w // 2, top, x + candle_w // 2, max(top + 3, bottom)),
                            fill=color, outline=color)
 
-        for value, label_text, color in ((spec["entry"], "ENTRY", "#58a6ff"),
-                                         (spec["stop"], "STOP", "#f85149"),
-                                         (spec["target"], "TAKE PROFIT", "#3fb950")):
+        for value, label_text, color in ((spec.get("entry"), "ENTRY", "#58a6ff"),
+                                         (spec.get("stop"), "STOP", "#f85149"),
+                                         (spec.get("target"), "TAKE PROFIT", "#3fb950")):
+            if value is None:
+                continue
             y = _map_y(value, low, high, chart_top, chart_bottom)
             draw.line((chart_left, y, chart_right, y), fill=color, width=3)
             draw.text((890, y - 14), label_text, font=_font(20, True), fill=color)
