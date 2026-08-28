@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from pypdf import PdfReader
@@ -13,7 +14,7 @@ def test_manual_is_detailed_and_current():
     # Pin the published version; update on every manual publish. (This was
     # stale at v0.13.7 while the repo served the 0.14.8 manual - the pin
     # only works if publishing and updating it travel together.)
-    assert "v0.15.2" in str(reader.metadata.title)
+    assert "v0.16.8" in str(reader.metadata.title)
     text = "\n".join(page.extract_text() or "" for page in reader.pages)
     required = [
         "Install on Windows",
@@ -43,6 +44,9 @@ def test_manual_is_detailed_and_current():
 def test_manual_has_current_screens_and_all_strategy_images():
     screens = list((ROOT / "manual-assets").glob("screen-*.jpg"))
     strategies = list((ROOT / "manual-assets" / "strategies").glob("*.png"))
+    catalogue = json.loads(
+        (ROOT / "manual-assets" / "strategy-catalogue.json").read_text("utf-8")
+    )
     assert len(screens) >= 8
-    assert len(strategies) == 17
+    assert {path.stem for path in strategies} == {row["id"] for row in catalogue}
     assert all(path.stat().st_size > 10_000 for path in screens + strategies)

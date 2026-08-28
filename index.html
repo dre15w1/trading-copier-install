@@ -518,10 +518,10 @@
       <a id="all-releases" href="#">All versions</a>.
     </p>
 
-    <!-- The guide is served from this repo rather than as a release asset, so
-         the link works whether or not a release has been published yet, and
-         does not move when one is. -->
-    <a class="guide" href="Trading-Copier-Setup-Guide.pdf">
+    <!-- Follow the stable latest-release alias so every tagged copier release
+         and its matching manual go live together. The checked-in PDF remains
+         a fallback for old direct links. -->
+    <a class="guide" href="https://github.com/dre15w1/trading-copier-install/releases/latest/download/Trading-Copier-Setup-Guide.pdf">
       <span class="guide-ico" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6zM14 2v4h4"
           fill="none" stroke="currentColor" stroke-width="1.6"
@@ -754,7 +754,7 @@ xattr -d com.apple.quarantine "$FILE"
 
   <section>
     <h2>Trouble?</h2>
-    <p class="muted">Check <a href="Trading-Copier-Setup-Guide.pdf">the setup guide</a> first —
+    <p class="muted">Check <a href="https://github.com/dre15w1/trading-copier-install/releases/latest/download/Trading-Copier-Setup-Guide.pdf">the setup guide</a> first —
       its last section lists every warning the program can show you and what each one
       wants you to do.</p>
     <p class="muted">Still stuck? Text Andre. Useful things to include: which screen you’re

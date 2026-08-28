@@ -29,6 +29,15 @@ def test_windows_download_uses_the_friendly_installer() -> None:
     assert 'data-asset="copier-agent-windows.exe"' not in PAGE
 
 
+def test_manual_links_follow_the_latest_release() -> None:
+    stable = (
+        "https://github.com/dre15w1/trading-copier-install/releases/"
+        "latest/download/Trading-Copier-Setup-Guide.pdf"
+    )
+    assert PAGE.count(f'href="{stable}"') == 2
+    assert 'href="Trading-Copier-Setup-Guide.pdf"' not in PAGE
+
+
 def test_page_explains_device_code_onboarding() -> None:
     assert "Copy device code" in PAGE
     assert "TV1-" in PAGE
