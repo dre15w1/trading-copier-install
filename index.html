@@ -341,6 +341,20 @@
 
 <div class="wrap">
 
+  <section id="release-update" aria-labelledby="release-heading">
+    <h2 id="release-heading">Latest update &mdash; v0.16.48</h2>
+    <h3>Adopted holdings no longer block new entries.</h3>
+    <p>The copier now saves the cost of a holding you adopt and repairs missing
+      costs on older adopted holdings when it starts. If it cannot determine a
+      cost, it identifies that holding instead of saying your capital partition is full.</p>
+    <p>To undo an adoption, open <strong>Trades</strong>, expand
+      <strong>Stop managing</strong> beside the holding, and confirm the action.
+      Nothing is sold. Existing Schwab orders remain active; review them in Schwab.</p>
+    <p class="muted">Already installed? Close the copier before running the updated
+      installer from Step 2, then reopen it.
+      <a href="https://github.com/dre15w1/trading-copier-install/releases/tag/v0.16.48">Release details</a>.</p>
+  </section>
+
   <section>
     <h2>Step 1 &mdash; The agreement</h2>
 
@@ -815,14 +829,14 @@ xattr -d com.apple.quarantine "$FILE"
       function sizeOf(prefix, excludeExe) {
         for (var i = 0; i < assets.length; i++) {
           var n = assets[i].name || "";
-          if (n.indexOf(prefix) === 0 && !/SHA256/.test(n)) {
+          if (n === prefix && !/SHA256/.test(n)) {
             if (excludeExe && /\.exe$/.test(n)) continue;
             return assets[i].size;
           }
         }
         return null;
       }
-      var w = sizeOf("Trading-Copier-Setup", false);
+      var w = sizeOf("Trading-Copier-Setup.exe", false);
       var ma = sizeOf("copier-agent-macos-apple-silicon", true);
       setText("meta-win", w ? human(w) + " · v" + tag : "v" + tag);
       if (ma) setText("meta-mac-arm", human(ma) + " · v" + tag);

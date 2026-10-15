@@ -1,9 +1,40 @@
 """Static release-link contract for the public installation page."""
 
 from pathlib import Path
+import json
+import subprocess
 
 
 PAGE = Path(__file__).with_name("index.html").read_text(encoding="utf-8")
+
+
+def test_release_card_uses_installer_size_instead_of_manual_size():
+    script = r'''
+const vm = require('node:vm');
+const page = require('node:fs').readFileSync('index.html', 'utf8');
+(async () => {
+  const elements = {};
+  const document = {
+    querySelectorAll: () => [],
+    getElementById: id => elements[id] ||= {}
+  };
+  const rel = {tag_name:'v0.16.48', assets:[
+    {name:'Trading-Copier-Setup-Guide.pdf',size:2589407},
+    {name:'Trading-Copier-Setup.exe',size:17268044},
+    {name:'copier-agent-macos-apple-silicon',size:16555536}
+  ]};
+  const code = page.split('<script>')[1].split('// The terms gate.')[0];
+  vm.runInNewContext(code, {document, fetch: async () => ({ok:true,json:async()=>rel})});
+  await new Promise(resolve => setImmediate(resolve));
+  console.log(JSON.stringify(elements));
+})();
+'''
+    result = subprocess.run(["node", "-e", script], text=True, encoding="utf-8",
+                            cwd=Path(__file__).parent, timeout=30,
+                            capture_output=True, check=True)
+    elements = json.loads(result.stdout)
+    assert elements["meta-win"]["textContent"] == "16.5 MB · v0.16.48"
+    assert elements["meta-mac-arm"]["textContent"] == "15.8 MB · v0.16.48"
 
 
 def test_page_offers_apple_silicon_and_a_pinned_legacy_intel_build() -> None:

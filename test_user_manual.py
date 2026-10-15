@@ -14,12 +14,12 @@ def test_manual_is_detailed_and_current():
     # Pin the published version; update on every manual publish. (This was
     # stale at v0.13.7 while the repo served the 0.14.8 manual - the pin
     # only works if publishing and updating it travel together.)
-    assert "v0.16.8" in str(reader.metadata.title)
+    assert "v0.16.48" in str(reader.metadata.title)
     text = "\n".join(page.extract_text() or "" for page in reader.pages)
     required = [
         "Install on Windows",
         "Install on a Mac",
-        "The five setup screens",
+        "The setup screens",
         "Schwab portal - create the developer account",
         "Wait for approval, then find the App Key and Secret",
         "Put the Schwab credentials into the copier",
